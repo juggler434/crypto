@@ -17,9 +17,12 @@ func init() {
 	rootCmd.AddCommand(set1Command)
 	set1Command.AddCommand(set1Challenge1)
 	set1Command.AddCommand(set1Challenge2)
+	set1Command.AddCommand(set1Challenge3)
 
 	set1Challenge2.Flags().StringVarP(&hexString, "hex1", "", "", "Hex string to compare")
 	set1Challenge2.Flags().StringVarP(&hexString2, "hex2", "", "", "Hex string to compare to")
+
+	set1Challenge3.Flags().StringVarP(&hexString, "hex", "", "", "Hex string to run cipher on")
 
 }
 
@@ -52,6 +55,20 @@ var set1Challenge2 = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		ret, err := cryptopals.FixedXor([]byte(hexString), []byte(hexString2))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set1Challenge3 = &cobra.Command{
+	Use:   "challenge3",
+	Short: "performs a single byte xor cipher on hex encoded string",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret, err := cryptopals.SingleXorCipher([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
