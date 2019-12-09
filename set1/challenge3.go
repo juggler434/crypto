@@ -1,10 +1,10 @@
 package cryptopals
 
 //SingleXorCipher takes an encoded message and decodes it into a human readable string
-func SingleXorCipher(codedMessage []byte) ([]byte, error) {
+func SingleXorCipher(codedMessage []byte) ([]byte, int, error) {
 	b, err := decodeHexBytes(codedMessage)
 	if err != nil {
-		return nil, err
+		return nil, 0,  err
 	}
 	var answer []byte
 	var score int
@@ -23,7 +23,7 @@ func SingleXorCipher(codedMessage []byte) ([]byte, error) {
 
 		s = 0
 	}
-	return answer, nil
+	return answer, score, nil
 }
 
 func getCharWeight(char byte) int {

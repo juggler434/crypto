@@ -19,7 +19,7 @@ func TestSingleXorCipher(t *testing.T) {
 		hb := make([]byte, hex.EncodedLen(len(eb)))
 		hex.Encode(hb, eb)
 
-		res, err := SingleXorCipher(hb)
+		res, _, err := SingleXorCipher(hb)
 		if err != nil {
 			t.Errorf("Expected: error to be nil, got: %s", err)
 		}
@@ -32,7 +32,7 @@ func TestSingleXorCipher(t *testing.T) {
 	t.Run("with invalid input", func(t *testing.T) {
 		ts := []byte("Not a valid input")
 
-		res, err := SingleXorCipher(ts)
+		res, _, err := SingleXorCipher(ts)
 		if res != nil {
 			t.Errorf("Expected nil, got: %s", res)
 		}

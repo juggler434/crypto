@@ -68,7 +68,7 @@ var set1Challenge3 = &cobra.Command{
 	Short: "performs a single byte xor cipher on hex encoded string",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.SingleXorCipher([]byte(hexString))
+		ret, _, err := cryptopals.SingleXorCipher([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
