@@ -12,6 +12,8 @@ import (
 var hexString string
 var hexString2 string
 var fileName string
+var plainText string
+var key string
 
 func init() {
 	set1Challenge1.Flags().StringVarP(&hexString, "hex", "", "", "Hex string to convert to base64")
@@ -20,11 +22,14 @@ func init() {
 	set1Command.AddCommand(set1Challenge2)
 	set1Command.AddCommand(set1Challenge3)
 	set1Command.AddCommand(set1Challenge4)
+	set1Command.AddCommand(set1Challenge5)
 
 	set1Challenge2.Flags().StringVarP(&hexString, "hex1", "", "", "Hex string to compare")
 	set1Challenge2.Flags().StringVarP(&hexString2, "hex2", "", "", "Hex string to compare to")
 	set1Challenge3.Flags().StringVarP(&hexString, "hex", "", "", "Hex string to run cipher on")
 	set1Challenge4.Flags().StringVarP(&fileName, "file", "", "", "Text file location")
+	set1Challenge5.Flags().StringVarP(&plainText, "input", "", "", "Text to encrpyt")
+	set1Challenge5.Flags().StringVarP(&key, "key", "", "", "Key for encrypting text")
 
 }
 
@@ -80,11 +85,26 @@ var set1Challenge3 = &cobra.Command{
 }
 
 var set1Challenge4 = &cobra.Command{
-	Use: "challenge4",
+	Use:   "challenge4",
 	Short: "finds which string has been single xor encoded in a file",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		ret, err := cryptopals.FindXorCipherString(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set1Challenge5 = &cobra.Command{
+	Use:   "challenge5",
+	Short: "Repeting Xor encrypts a string using the given key.  Returns a hex encoded string",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(plainText)
+		ret, err := cryptopals.EncryptWithRepeatingXor([]byte(plainText), []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
