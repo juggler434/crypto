@@ -24,6 +24,7 @@ func init() {
 	set1Command.AddCommand(set1Challenge4)
 	set1Command.AddCommand(set1Challenge5)
 	set1Command.AddCommand(set1Challenge6)
+	set1Command.AddCommand(set1Challenge7)
 
 	set1Challenge2.Flags().StringVarP(&hexString, "hex1", "", "", "Hex string to compare")
 	set1Challenge2.Flags().StringVarP(&hexString2, "hex2", "", "", "Hex string to compare to")
@@ -32,6 +33,8 @@ func init() {
 	set1Challenge5.Flags().StringVarP(&plainText, "input", "", "", "Text to encrpyt")
 	set1Challenge5.Flags().StringVarP(&key, "key", "", "", "Key for encrypting text")
 	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "","File to be decrypted")
+	set1Challenge7.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
+	set1Challenge7.Flags().StringVarP(&key, "key", "", "", "Key for encrypted text")
 
 }
 
@@ -121,6 +124,20 @@ var set1Challenge6 = &cobra.Command{
 	Long: "",
 	Run: func(cmd *cobra.Command, args []string) {
 		ret, err := cryptopals.XorDecryptFile(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set1Challenge7 = &cobra.Command{
+	Use: "challenge7",
+	Short: "Decrypt and AES ECB 128 encrypted file that has been base64 encoded",
+	Long: "",
+	Run: func(cmd *cobra.Command, args []string) {
+		ret, err := cryptopals.DecryptAES128Ecb(fileName, []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
