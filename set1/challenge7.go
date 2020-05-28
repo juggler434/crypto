@@ -18,6 +18,16 @@ func DecryptAES128Ecb(file string, key []byte)([]byte, error) {
 		return nil, err
 	}
 
+	plainText, err := decryptEcb(ueb, key)
+	if err != nil {
+		return nil, err
+	}
+
+	plainText = bytes.Trim(plainText, "\x04")
+	return plainText, nil
+}
+
+func decryptEcb(ueb []byte,  key []byte) ([]byte,  error) {
 	ueb = bytes.Trim(ueb, "\x00")
 
 	cipher, err := aes.NewCipher(key)
@@ -26,11 +36,8 @@ func DecryptAES128Ecb(file string, key []byte)([]byte, error) {
 	}
 
 	plainText := make([]byte, len(ueb))
-	for eb, db := 0, 16; eb < len(ueb); eb, db = eb + 16, db + 16 {
+	for eb, db := 0, 16; eb < len(ueb); eb, db = eb+16, db+16 {
 		cipher.Decrypt(plainText[eb:db], ueb[eb:db])
 	}
-
-	plainText = plainText[:len(ueb)]
-	plainText = bytes.Trim(plainText, "\x04")
 	return plainText, nil
 }
