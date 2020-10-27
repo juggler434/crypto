@@ -6,45 +6,51 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"math"
 )
 
-func DetectECBEncryption(file string) ([]byte, error) {
-	// 1. Read file line by line
-	// 2. Hex decode line
-	// 3. AES Decrypt the line
-	// 4. Encrpyt line again
-	// 5. Check to see if the encrypted line matches the unecrypted line
-	// 6. If it does, return the unencrypted line
+func DetectECBEncryption(file string) (int, error) {
 	f, err := ioutil.ReadFile(file)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-
-	lhd := math.MaxInt32
-	var res []byte
-
+	res := 0
 	scanner := bufio.NewScanner(bytes.NewReader(f))
+	dups := 0
+	var ct string
+
+	ln := 0
 	for scanner.Scan() {
+		ln += 1
 		l, err := decodeHexBytes(scanner.Bytes())
 		if err != nil {
-			return nil, err
+			return 0, err
 		}
-		key := []byte("YELLOW SUBMARINE") // TODO MAKE THIS A CONSTANT BECAUSE IT AINT CHANGING
-		ueb, err := decryptEcb(l, key)
-		if err != nil {
-			return nil, err
+		dia := 0
+		chunks := make([][]byte, 0)
+		for i := 0; i < len(l); i += 16 {
+			batch := l[i:min(i+15, len(l))]
+			for _, c := range chunks {
+				if bytes.Equal(c, batch) {
+					dia += 1
+					break
+				}
+			}
+			chunks = append(chunks, batch)
 		}
-
-		hd := getHammingDistance(ueb[:16], ueb[16:32])
-		if hd < lhd {
-			lhd = hd
-			m := make([]byte, hex.EncodedLen(len(l)))
-			hex.Encode(m, l)
-			res = m
+		if dia > dups {
+			dups = dia
+			res = ln
+			ct = hex.EncodeToString(l)
 		}
 	}
-	fmt.Println(lhd)
-	fmt.Printf("%s\n", res)
-	return f, nil
+	fmt.Println(ct)
+	fmt.Printf("Line Number: %d \n", res)
+	return res, nil
+}
+
+func min(a, b int) int {
+	if a <= b {
+		return a
+	}
+	return b
 }
