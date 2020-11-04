@@ -25,6 +25,7 @@ func init() {
 	set1Command.AddCommand(set1Challenge5)
 	set1Command.AddCommand(set1Challenge6)
 	set1Command.AddCommand(set1Challenge7)
+	set1Command.AddCommand(set1Challenge8)
 
 	set1Challenge2.Flags().StringVarP(&hexString, "hex1", "", "", "Hex string to compare")
 	set1Challenge2.Flags().StringVarP(&hexString2, "hex2", "", "", "Hex string to compare to")
@@ -35,6 +36,7 @@ func init() {
 	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "","File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&key, "key", "", "", "Key for encrypted text")
+	set1Challenge8.Flags().StringVarP(&fileName, "file", "", "", "File to detect encryption in")
 
 }
 
@@ -143,5 +145,18 @@ var set1Challenge7 = &cobra.Command{
 			os.Exit(1)
 		}
 		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set1Challenge8 = &cobra.Command{
+	Use: "challenge8",
+	Short: "Find AES encrypted line in a file",
+	Long: "",
+	Run: func(cmd *cobra.Command, args []string) {
+		_, err := cryptopals.DetectECBEncryption(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	},
 }
