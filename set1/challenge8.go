@@ -3,8 +3,8 @@ package cryptopals
 import (
 	"bufio"
 	"bytes"
-	"encoding/hex"
 	"fmt"
+	"github.com/juggler434/crypto/encoding/hex"
 	"io/ioutil"
 )
 
@@ -16,12 +16,12 @@ func DetectECBEncryption(file string) (int, error) {
 	res := 0
 	scanner := bufio.NewScanner(bytes.NewReader(f))
 	dups := 0
-	var ct string
+	var ct []byte
 
 	ln := 0
 	for scanner.Scan() {
 		ln += 1
-		l, err := decodeHexBytes(scanner.Bytes())
+		l, err := hex.Decode(scanner.Bytes())
 		if err != nil {
 			return 0, err
 		}
@@ -40,7 +40,7 @@ func DetectECBEncryption(file string) (int, error) {
 		if dia > dups {
 			dups = dia
 			res = ln
-			ct = hex.EncodeToString(l)
+			ct = hex.Encode(l)
 		}
 	}
 	fmt.Println(ct)

@@ -3,17 +3,9 @@ package cryptopals
 
 import (
 	"encoding/base64"
-	"encoding/hex"
+	"github.com/juggler434/crypto/encoding/hex"
 )
 
-func decodeHexBytes(hexBytes []byte) ([]byte, error) {
-	ret := make([]byte, hex.DecodedLen(len(hexBytes)))
-	_, err := hex.Decode(ret, hexBytes)
-	if err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
 
 func encodeToBase64(input []byte) []byte {
 	ret := make([]byte, base64.StdEncoding.EncodedLen(len(input)))
@@ -23,7 +15,7 @@ func encodeToBase64(input []byte) []byte {
 
 //HexToBase64 takes a slice of hex encoded bytes, and returns a slice of base64 encoding bytes
 func HexToBase64(hexBytes []byte) ([]byte, error) {
-	b, err := decodeHexBytes(hexBytes)
+	b, err := hex.Decode(hexBytes)
 	if err != nil {
 		return nil, err
 	}

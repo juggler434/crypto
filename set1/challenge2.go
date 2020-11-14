@@ -1,17 +1,17 @@
 package cryptopals
 
 import (
-	"encoding/hex"
+	"github.com/juggler434/crypto/encoding/hex"
 	"errors"
 )
 
 // FixedXor takes 2 hex encoded byte slices, and returns a hex encoded byte slice of their xor combinations
 func FixedXor(input1, input2 []byte) ([]byte, error) {
-	dc1, err := decodeHexBytes(input1)
+	dc1, err := hex.Decode(input1)
 	if err != nil {
 		return nil, err
 	}
-	dc2, err := decodeHexBytes(input2)
+	dc2, err := hex.Decode(input2)
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,6 @@ func FixedXor(input1, input2 []byte) ([]byte, error) {
 		ret[i] = dc1[i] ^ dc2[i]
 	}
 
-	hret := make([]byte, hex.EncodedLen(len(ret)))
-	hex.Encode(hret, ret)
+	hret := hex.Encode(ret)
 	return hret, nil
 }

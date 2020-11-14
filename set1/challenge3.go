@@ -1,8 +1,10 @@
 package cryptopals
 
+import "github.com/juggler434/crypto/encoding/hex"
+
 //SingleXorCipher takes an encoded message and decodes it into a human readable string
 func SingleXorCipher(codedMessage []byte) ([]byte, int, error) {
-	b, err := decodeHexBytes(codedMessage)
+	b, err := hex.Decode(codedMessage)
 	if err != nil {
 		return nil, 0,  err
 	}
