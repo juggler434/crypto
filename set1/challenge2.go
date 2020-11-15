@@ -1,8 +1,8 @@
 package cryptopals
 
 import (
-	"github.com/juggler434/crypto/encoding/hex"
 	"errors"
+	"github.com/juggler434/crypto/encoding/hex"
 )
 
 // FixedXor takes 2 hex encoded byte slices, and returns a hex encoded byte slice of their xor combinations
