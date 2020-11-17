@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/juggler434/crypto/encoding/hex"
 	"os"
 
 	cryptopals "github.com/juggler434/crypto/set1"
@@ -68,7 +69,17 @@ var set1Challenge2 = &cobra.Command{
 	Short: "performs fixed xor comparison on two hex encoded strings",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.FixedXor([]byte(hexString), []byte(hexString2))
+		input1, err := hex.Decode([]byte(hexString))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		input2, err := hex.Decode([]byte(hexString2))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ret, err := cryptopals.FixedXor(input1, input2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
