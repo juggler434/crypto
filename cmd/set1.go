@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"github.com/juggler434/crypto/encoding/hex"
 	"github.com/juggler434/crypto/xor"
+	"io/ioutil"
 	"os"
+	"strings"
 
 	cryptopals "github.com/juggler434/crypto/set1"
 
@@ -109,11 +111,24 @@ var set1Challenge4 = &cobra.Command{
 	Short: "finds which string has been single xor encoded in a file",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := xor.DetectSingleCharEncryption(fileName)
+		var input [][]byte
+		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		lns := strings.Split(string(f), "\n")
+		for _, ln := range lns {
+			dhl, err := hex.Decode([]byte(ln))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			input = append(input, dhl)
+		}
+		ret := xor.DetectSingleCharEncryption(input)
 		fmt.Printf("%s\n", ret)
 	},
 }
