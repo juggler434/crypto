@@ -1,15 +1,15 @@
-package cryptopals
+package xor
 
 import (
 	"testing"
 )
 
 
-const TestFile = "./files/xor_test.txt"
+const TestFile = "./test_files/xor_test.txt"
 const TestString = "test case"
-func TestFindXorCipherString(t *testing.T) {
+func TestDetectSingleCharEncryption(t *testing.T) {
 	t.Run("with valid params", func(t *testing.T) {
-		res, err := FindXorCipherString(TestFile)
+		res, err := DetectSingleCharEncryption(TestFile)
 		if err != nil {
 			t.Errorf("Expected: error to be nil, got: %s", err)
 		}
@@ -20,7 +20,7 @@ func TestFindXorCipherString(t *testing.T) {
 	})
 
 	t.Run("with invalid file", func(t *testing.T) {
-		res, err := FindXorCipherString("nothing/there.txt")
+		res, err := DetectSingleCharEncryption("nothing/there.txt")
 		if res != nil {
 			t.Errorf("Expected: result to be nil, got: %s", res)
 		}

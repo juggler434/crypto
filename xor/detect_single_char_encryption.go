@@ -1,13 +1,12 @@
-package cryptopals
+package xor
 
 import (
 	"github.com/juggler434/crypto/encoding/hex"
-	"github.com/juggler434/crypto/xor"
 	"io/ioutil"
 	"strings"
 )
 
-func FindXorCipherString(dest string) ([]byte, error) {
+func DetectSingleCharEncryption(dest string) ([]byte, error) {
 	f, err := ioutil.ReadFile(dest)
 	if err != nil {
 		return nil, err
@@ -23,7 +22,7 @@ func FindXorCipherString(dest string) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		st, sc:= xor.SingleCharDecode(dl)
+		st, sc:= SingleCharDecode(dl)
 
 		if sc > score {
 			res = st

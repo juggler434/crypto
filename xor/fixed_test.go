@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestFixedXor(t *testing.T) {
+func TestFixed(t *testing.T) {
 	tests := []struct{
 		name string
 		input1 []byte

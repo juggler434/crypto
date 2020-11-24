@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestSingleXorCipher(t *testing.T) {
+func TestSingleCharDecode(t *testing.T) {
 	t.Run("with valid input", func(t *testing.T) {
 		ts := []byte("I should get this")
 		k := byte('e')

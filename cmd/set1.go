@@ -109,7 +109,7 @@ var set1Challenge4 = &cobra.Command{
 	Short: "finds which string has been single xor encoded in a file",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.FindXorCipherString(fileName)
+		ret, err := xor.DetectSingleCharEncryption(fileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
