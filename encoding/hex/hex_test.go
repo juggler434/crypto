@@ -56,10 +56,10 @@ func TestDecode(t *testing.T) {
 				if err == nil {
 					t.Error("expected an error, got: nil")
 				}
-			}
-
-			if err != nil {
-				t.Errorf("expected nil error, got: %s", err)
+			} else {
+				if err != nil {
+					t.Errorf("expected nil error, got: %s", err)
+				}
 			}
 
 			if !bytes.Equal(test.expectedOutput, r) {

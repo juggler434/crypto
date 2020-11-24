@@ -1,4 +1,4 @@
-package cryptopals
+package xor
 
 import (
 	"bytes"
@@ -41,7 +41,7 @@ func TestFixedXor(t *testing.T) {
 				t.Fatal("Error decoding hex input 2")
 			}
 
-			res, err := FixedXor(di1, di2)
+			res, err := Fixed(di1, di2)
 			if test.shouldError {
 				if err == nil {
 					t.Error("expected: error, got: nil")

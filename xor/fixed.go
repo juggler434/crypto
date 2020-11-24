@@ -1,11 +1,11 @@
-package cryptopals
+package xor
 
 import (
 	"errors"
 )
 
-// FixedXor takes 2 byte slices and returns the XORd result
-func FixedXor(input1, input2 []byte) ([]byte, error) {
+// Fixed takes 2 byte slices and returns the XORd result
+func Fixed(input1, input2 []byte) ([]byte, error) {
 	if len(input1) != len(input2) {
 		return nil, errors.New("the inputs have mismatched lengths")
 	}

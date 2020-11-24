@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/juggler434/crypto/encoding/hex"
+	"github.com/juggler434/crypto/xor"
 	"os"
 
 	cryptopals "github.com/juggler434/crypto/set1"
@@ -55,7 +56,7 @@ var set1Challenge1 = &cobra.Command{
 	Short: "runs hex to base64 encoding",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.HexToBase64([]byte(hexString))
+		ret, err := hex.ToBase64([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -79,7 +80,7 @@ var set1Challenge2 = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ret, err := cryptopals.FixedXor(input1, input2)
+		ret, err := xor.Fixed(input1, input2)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
