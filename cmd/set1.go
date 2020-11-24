@@ -138,8 +138,8 @@ var set1Challenge5 = &cobra.Command{
 	Short: "Repeting Xor encrypts a string using the given key.  Returns a hex encoded string",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(plainText)
-		ret, err := cryptopals.EncryptWithRepeatingXor([]byte(plainText), []byte(key))
+		he := hex.Encode([]byte(plainText))
+		ret, err := xor.EncryptWithRepeatingKey(he, []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
