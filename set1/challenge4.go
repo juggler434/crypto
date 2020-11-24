@@ -1,6 +1,8 @@
 package cryptopals
 
 import (
+	"github.com/juggler434/crypto/encoding/hex"
+	"github.com/juggler434/crypto/xor"
 	"io/ioutil"
 	"strings"
 )
@@ -17,10 +19,12 @@ func FindXorCipherString(dest string) ([]byte, error) {
 	var score int
 
 	for _, l := range lns {
-		st, sc, err := SingleXorCipher([]byte(l))
+		dl, err := hex.Decode([]byte(l))
 		if err != nil {
 			return nil, err
 		}
+		st, sc:= xor.SingleCharDecode(dl)
+
 		if sc > score {
 			res = st
 			score = sc

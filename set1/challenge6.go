@@ -3,7 +3,7 @@ package cryptopals
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/hex"
+	"github.com/juggler434/crypto/xor"
 	"io/ioutil"
 	"sort"
 )
@@ -68,7 +68,7 @@ func XorDecryptFile(file string) ([]byte, error) {
 		r := rebuildString(unencChunks)
 		var score int
 		for _, b := range r {
-			score += getCharWeight(b)
+			score += xor.GetCharWeight(b)
 		}
 		if score > retstre {
 			ret = r
@@ -94,12 +94,7 @@ func rebuildString(unencChunks [][]byte) []byte {
 func applyXorCipher(kl int, chunks [][]byte) ([][]byte, []byte, error) {
 	unencChunks := make([][]byte, kl)
 	for i, c := range chunks {
-		hb := make([]byte, hex.EncodedLen(len(c)))
-		hex.Encode(hb, c)
-		s, _, err := SingleXorCipher(hb)
-		if err != nil {
-			return nil, nil, err
-		}
+		s, _:= xor.SingleCharDecode(c)
 		unencChunks[i] = s
 	}
 	return unencChunks, nil, nil

@@ -1,21 +1,15 @@
-package cryptopals
+package xor
 
-import "github.com/juggler434/crypto/encoding/hex"
-
-//SingleXorCipher takes an encoded message and decodes it into a human readable string
-func SingleXorCipher(codedMessage []byte) ([]byte, int, error) {
-	b, err := hex.Decode(codedMessage)
-	if err != nil {
-		return nil, 0,  err
-	}
+//SingleCharDecode takes an encoded message and decodes it into a human readable string
+func SingleCharDecode(codedMessage []byte) ([]byte, int) {
 	var answer []byte
 	var score int
 	for i := 0; i < 256; i++ {
-		r := make([]byte, len(b))
+		r := make([]byte, len(codedMessage))
 		var s int
-		for j := 0; j < len(b); j++ {
-			c := b[j] ^ byte(i)
-			s += getCharWeight(c)
+		for j := 0; j < len(codedMessage); j++ {
+			c := codedMessage[j] ^ byte(i)
+			s += GetCharWeight(c)
 			r[j] = c
 		}
 		if s > score {
@@ -25,10 +19,10 @@ func SingleXorCipher(codedMessage []byte) ([]byte, int, error) {
 
 		s = 0
 	}
-	return answer, score, nil
+	return answer, score
 }
 
-func getCharWeight(char byte) int {
+func GetCharWeight(char byte) int {
 	wm := map[byte]int{
 		byte('U'): 2,
 		byte('u'): 2,
