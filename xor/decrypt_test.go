@@ -1,6 +1,13 @@
-package cryptopals
+package xor
 
-import "testing"
+import (
+	"bytes"
+	"encoding/base64"
+	"fmt"
+	"io/ioutil"
+	"os"
+	"testing"
+)
 
 func TestGetHammingDistance(t *testing.T) {
 	s1 := []byte("this is a test")
@@ -13,9 +20,23 @@ func TestGetHammingDistance(t *testing.T) {
 	}
 }
 
-func TestXorDecryptFile(t *testing.T) {
+func TestDecrypt(t *testing.T) {
 	t.Run("with valid input", func(t *testing.T) {
-		r, err := XorDecryptFile(BreakXorTestFile)
+		f, err := ioutil.ReadFile(BreakXorTestFile)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		ueb = bytes.Trim(ueb, "\x00")
+
+		r, err := Decrypt(ueb)
 		if err != nil {
 			t.Errorf("Expected err to be nil, got: %s", err)
 		}
@@ -64,4 +85,4 @@ All the lonely people
 Where do they all belong?`
 
 const BreakXorKey = "JUDE" //This isn't used, I included it for reference
-const BreakXorTestFile = "./files/xor_decrypt_test.txt"
+const BreakXorTestFile = "./test_files/xor_decrypt_test.txt"

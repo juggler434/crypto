@@ -1,10 +1,6 @@
-package cryptopals
+package xor
 
 import (
-	"bytes"
-	"encoding/base64"
-	"github.com/juggler434/crypto/xor"
-	"io/ioutil"
 	"sort"
 )
 
@@ -41,25 +37,15 @@ func getKeyLengths(input []byte) []keyLength {
 	return kl
 }
 
-func XorDecryptFile(file string) ([]byte, error) {
-	f, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-	_, err = base64.StdEncoding.Decode(ueb, f)
-	if err != nil {
-		return nil, err
-	}
+func Decrypt(encryptedBytes []byte) ([]byte, error) {
 
-	ueb = bytes.Trim(ueb, "\x00")
-	kls := getKeyLengths(ueb)
+	kls := getKeyLengths(encryptedBytes)
 	
 	var ret []byte
 	var retstre int
 	for kli := 0; kli < 5; kli++ {
 		kl := kls[kli].length
-		chunks := makeByteChunks(kl, ueb)
+		chunks := makeByteChunks(kl, encryptedBytes)
 
 		unencChunks, _, err := applyXorCipher(kl, chunks)
 		if err != nil {
@@ -68,7 +54,7 @@ func XorDecryptFile(file string) ([]byte, error) {
 		r := rebuildString(unencChunks)
 		var score int
 		for _, b := range r {
-			score += xor.GetCharWeight(b)
+			score += GetCharWeight(b)
 		}
 		if score > retstre {
 			ret = r
@@ -94,7 +80,7 @@ func rebuildString(unencChunks [][]byte) []byte {
 func applyXorCipher(kl int, chunks [][]byte) ([][]byte, []byte, error) {
 	unencChunks := make([][]byte, kl)
 	for i, c := range chunks {
-		s, _:= xor.SingleCharDecode(c)
+		s, _:= SingleCharDecode(c)
 		unencChunks[i] = s
 	}
 	return unencChunks, nil, nil

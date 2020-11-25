@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
 	"github.com/juggler434/crypto/encoding/hex"
 	"github.com/juggler434/crypto/xor"
@@ -153,7 +155,20 @@ var set1Challenge6 = &cobra.Command{
 	Short: "Decrypt a Base64 encoded repeating XOR encoded file",
 	Long: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.XorDecryptFile(fileName)
+		f, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		ueb = bytes.Trim(ueb, "\x00")
+		ret, err := xor.Decrypt(ueb)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
