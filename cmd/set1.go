@@ -1,16 +1,16 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"github.com/juggler434/crypto/aes128/ecb"
 	"github.com/juggler434/crypto/encoding/hex"
 	"github.com/juggler434/crypto/xor"
 	"io/ioutil"
 	"os"
 	"strings"
-
-	cryptopals "github.com/juggler434/crypto/set1"
 
 	"github.com/spf13/cobra"
 )
@@ -182,7 +182,19 @@ var set1Challenge7 = &cobra.Command{
 	Short: "Decrypt and AES ECB 128 encrypted file that has been base64 encoded",
 	Long: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.DecryptAES128Ecb(fileName, []byte(key))
+		f, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		ret, err := ecb.Decrypt(ueb, []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -196,7 +208,24 @@ var set1Challenge8 = &cobra.Command{
 	Short: "Find AES encrypted line in a file",
 	Long: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := cryptopals.DetectECBEncryption(fileName)
+		var input [][]byte
+		f, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		scanner := bufio.NewScanner(bytes.NewReader(f))
+		for scanner.Scan() {
+			hdl, err := hex.Decode(scanner.Bytes())
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			input = append(input, hdl)
+		}
+		_, err = ecb.Detect(input)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

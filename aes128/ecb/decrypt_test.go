@@ -1,13 +1,25 @@
-package cryptopals
+package ecb
 
 import (
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
-func TestDecryptAES128Ecb2(t *testing.T) {
+func TestDecrypt(t *testing.T) {
 	t.Run("with valid input", func(t *testing.T) {
-		res, err := DecryptAES128Ecb("./files/aes_decrypt_test.txt", []byte("YELLOW SUBMARINE"))
+
+		f, err := ioutil.ReadFile("./test_files/aes_decrypt_test.txt")
+		if err != nil {
+			t.Errorf("error should be nil, got: %s", err)
+		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			t.Errorf("error should be nil, got: %s", err)
+		}
+		res, err := Decrypt(ueb, []byte("YELLOW SUBMARINE"))
 		if err != nil {
 			t.Errorf("Expected: error to be nil, got: %s", err)
 		}
