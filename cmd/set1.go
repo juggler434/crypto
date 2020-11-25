@@ -39,7 +39,7 @@ func init() {
 	set1Challenge4.Flags().StringVarP(&fileName, "file", "", "", "Text file location")
 	set1Challenge5.Flags().StringVarP(&plainText, "input", "", "", "Text to encrpyt")
 	set1Challenge5.Flags().StringVarP(&key, "key", "", "", "Key for encrypting text")
-	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "","File to be decrypted")
+	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&key, "key", "", "", "Key for encrypted text")
 	set1Challenge8.Flags().StringVarP(&fileName, "file", "", "", "File to detect encryption in")
@@ -89,7 +89,8 @@ var set1Challenge2 = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Printf("%s\n", ret)
+		res := hex.Encode(ret)
+		fmt.Printf("%s\n", res)
 	},
 }
 
@@ -140,20 +141,21 @@ var set1Challenge5 = &cobra.Command{
 	Short: "Repeting Xor encrypts a string using the given key.  Returns a hex encoded string",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		he := hex.Encode([]byte(plainText))
-		ret, err := xor.EncryptWithRepeatingKey(he, []byte(key))
+		fmt.Println(plainText)
+		ret, err := xor.EncryptWithRepeatingKey([]byte(plainText), []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		ret = hex.Encode(ret)
 		fmt.Printf("%s\n", ret)
 	},
 }
 
 var set1Challenge6 = &cobra.Command{
-	Use: "challenge6",
+	Use:   "challenge6",
 	Short: "Decrypt a Base64 encoded repeating XOR encoded file",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
@@ -178,9 +180,9 @@ var set1Challenge6 = &cobra.Command{
 }
 
 var set1Challenge7 = &cobra.Command{
-	Use: "challenge7",
+	Use:   "challenge7",
 	Short: "Decrypt and AES ECB 128 encrypted file that has been base64 encoded",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
@@ -204,9 +206,9 @@ var set1Challenge7 = &cobra.Command{
 }
 
 var set1Challenge8 = &cobra.Command{
-	Use: "challenge8",
+	Use:   "challenge8",
 	Short: "Find AES encrypted line in a file",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		var input [][]byte
 		f, err := ioutil.ReadFile(fileName)
