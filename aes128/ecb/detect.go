@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func Detect(encryptedLines [][]byte) (int, error) {
+func Detect(encryptedLines [][]byte) int {
 	res := 0
 	dups := 0
 	var ct []byte
@@ -30,7 +30,7 @@ func Detect(encryptedLines [][]byte) (int, error) {
 	}
 	fmt.Println(ct)
 	fmt.Printf("Line Number: %d \n", res)
-	return res, nil
+	return res
 }
 
 func min(a, b int) int {

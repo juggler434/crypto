@@ -227,10 +227,8 @@ var set1Challenge8 = &cobra.Command{
 
 			input = append(input, hdl)
 		}
-		_, err = ecb.Detect(input)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		res := ecb.Detect(input)
+		fmt.Printf("%d", res)
+
 	},
 }

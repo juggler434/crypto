@@ -3,42 +3,52 @@ package ecb
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"github.com/juggler434/crypto/encoding/hex"
 	"io/ioutil"
-	"os"
 	"testing"
 )
 
 const (
 	ECBEncryptedLine = 2
+	ValidTestFile    = "./test_files/ecb_detection_test.txt"
 )
 
 func TestDetect(t *testing.T) {
-	var input [][]byte
-	f, err := ioutil.ReadFile("./test_files/ecb_detection_test.txt")
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	tests := []struct {
+		name           string
+		inputFile      string
+		expectedOutput int
+	}{
+		{
+			name:           "base case",
+			inputFile:      ValidTestFile,
+			expectedOutput: ECBEncryptedLine,
+		},
 	}
 
-	scanner := bufio.NewScanner(bytes.NewReader(f))
-	for scanner.Scan() {
-		hdl, err := hex.Decode(scanner.Bytes())
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			var input [][]byte
+			f, err := ioutil.ReadFile(test.inputFile)
+			if err != nil {
+				t.Errorf("failed to read test file: %s", err)
+			}
 
-		input = append(input, hdl)
-	}
-	res, err := Detect(input)
+			scanner := bufio.NewScanner(bytes.NewReader(f))
+			for scanner.Scan() {
+				hdl, err := hex.Decode(scanner.Bytes())
+				if err != nil {
+					t.Errorf("failed to decode hex bytes: %s", err)
+				}
 
-	if err != nil {
-		t.Errorf("Expected nil error, got %s", err)
-	}
+				input = append(input, hdl)
+			}
+			res := Detect(input)
 
-	if res != ECBEncryptedLine {
-		t.Errorf("Expected %d, got %d", ECBEncryptedLine, res)
+			if res != test.expectedOutput {
+				t.Errorf("Expected %d, got %d", test.expectedOutput, res)
+			}
+		})
+
 	}
 }
