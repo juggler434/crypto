@@ -1,24 +1,12 @@
-package cryptopals
+package ecb
 
 import (
 	"bytes"
 	"crypto/aes"
-	"encoding/base64"
-	"io/ioutil"
 )
 
-func DecryptAES128Ecb(file string, key []byte)([]byte, error) {
-	f, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-	_, err = base64.StdEncoding.Decode(ueb, f)
-	if err != nil {
-		return nil, err
-	}
-
-	plainText, err := decryptEcb(ueb, key)
+func Decrypt(cypherText, key []byte)([]byte, error) {
+	plainText, err := decryptEcb(cypherText, key)
 	if err != nil {
 		return nil, err
 	}

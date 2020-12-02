@@ -1,28 +1,100 @@
-package cryptopals
+package ecb
 
 import (
+	"bytes"
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"testing"
 )
 
-func TestDecryptAES128Ecb2(t *testing.T) {
-	t.Run("with valid input", func(t *testing.T) {
-		res, err := DecryptAES128Ecb("./files/aes_decrypt_test.txt", []byte("YELLOW SUBMARINE"))
-		if err != nil {
-			t.Errorf("Expected: error to be nil, got: %s", err)
-		}
+func TestDecrypt(t *testing.T) {
+	tests := []struct {
+		name           string
+		file           string
+		key            []byte
+		expectedReturn []byte
+		shouldError    bool
+	}{
+		{
+			name:           "base case",
+			file:           "./test_files/aes_decrypt_test.txt",
+			key:            []byte("YELLOW SUBMARINE"),
+			expectedReturn: []byte(ExpectedAESReturn),
+			shouldError:    false,
+		},
+		{
+			name:           "invalid key",
+			file:           "./test_files/aes_decrypt_test.txt",
+			key:            []byte("YELLO"),
+			expectedReturn: nil,
+			shouldError:    true,
+		},
+	}
 
-		for i, b := range []byte(ExpectedAESReturn) {
-			if res[i] != b {
-				fmt.Printf("The res char is: %d. the expected char is :%d, the index is: %d", b, res[i], i)
-				break
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+
+			f, err := ioutil.ReadFile(test.file)
+			if err != nil {
+				t.Errorf("error should be nil, got: %s", err)
 			}
-		}
+			ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+			_, err = base64.StdEncoding.Decode(ueb, f)
+			if err != nil {
+				t.Errorf("error should be nil, got: %s", err)
+			}
+			res, err := Decrypt(ueb, test.key)
+			if test.shouldError {
+				if err == nil {
+					t.Errorf("expected: error, got: nil")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("expected: nil error, got: %s", err)
+				}
+			}
 
-		if string(res) != ExpectedAESReturn {
-			t.Errorf("Expected: %s, got: %s", ExpectedAESReturn, res)
-		}
-	})
+			for i, b := range test.expectedReturn {
+				if res[i] != b {
+					fmt.Printf("The res char is: %d. the expected char is :%d, the index is: %d", b, res[i], i)
+					break
+				}
+			}
+
+			if !bytes.Equal(res, test.expectedReturn) {
+				t.Errorf("Expected: %s, got: %s", ExpectedAESReturn, res)
+			}
+		})
+	}
+
+	//t.Run("with valid input", func(t *testing.T) {
+	//
+	//	f, err := ioutil.ReadFile("./test_files/aes_decrypt_test.txt")
+	//	if err != nil {
+	//		t.Errorf("error should be nil, got: %s", err)
+	//	}
+	//	ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+	//	_, err = base64.StdEncoding.Decode(ueb, f)
+	//	if err != nil {
+	//		t.Errorf("error should be nil, got: %s", err)
+	//	}
+	//	res, err := Decrypt(ueb, []byte("YELLOW SUBMARINE"))
+	//	if err != nil {
+	//		t.Errorf("Expected: error to be nil, got: %s", err)
+	//	}
+	//
+	//	for i, b := range []byte(ExpectedAESReturn) {
+	//		if res[i] != b {
+	//			fmt.Printf("The res char is: %d. the expected char is :%d, the index is: %d", b, res[i], i)
+	//			break
+	//		}
+	//	}
+	//
+	//	if string(res) != ExpectedAESReturn {
+	//		t.Errorf("Expected: %s, got: %s", ExpectedAESReturn, res)
+	//	}
+	//})
 }
 
 const ExpectedAESReturn = `I'm back and I'm ringin' the bell 

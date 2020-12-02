@@ -1,24 +1,20 @@
-package cryptopals
+package xor
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/hex"
-	"io/ioutil"
 	"sort"
 )
 
 type keyLength struct {
-	length int
+	length   int
 	strength float64
 }
 
 func getHammingDistance(input1, input2 []byte) int {
 	var d int
 
-	for i := 0; i < len(input1); i ++ {
+	for i := 0; i < len(input1); i++ {
 		for j := 0; j < 8; j++ {
-			if input1[i] & (1<<uint(j)) != input2[i] & (1<<uint(j)) {
+			if input1[i]&(1<<uint(j)) != input2[i]&(1<<uint(j)) {
 				d++
 			}
 		}
@@ -37,38 +33,25 @@ func getKeyLengths(input []byte) []keyLength {
 		hd = hd / float64(len)
 		kl = append(kl, keyLength{strength: hd, length: len})
 	}
-	sort.Slice(kl, func(i, j int) bool {return kl[i].strength < kl[j].strength})
+	sort.Slice(kl, func(i, j int) bool { return kl[i].strength < kl[j].strength })
 	return kl
 }
 
-func XorDecryptFile(file string) ([]byte, error) {
-	f, err := ioutil.ReadFile(file)
-	if err != nil {
-		return nil, err
-	}
-	ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-	_, err = base64.StdEncoding.Decode(ueb, f)
-	if err != nil {
-		return nil, err
-	}
+func Decrypt(encryptedBytes []byte) []byte {
 
-	ueb = bytes.Trim(ueb, "\x00")
-	kls := getKeyLengths(ueb)
-	
+	kls := getKeyLengths(encryptedBytes)
+
 	var ret []byte
 	var retstre int
 	for kli := 0; kli < 5; kli++ {
 		kl := kls[kli].length
-		chunks := makeByteChunks(kl, ueb)
+		chunks := makeByteChunks(kl, encryptedBytes)
 
-		unencChunks, _, err := applyXorCipher(kl, chunks)
-		if err != nil {
-			return nil, err
-		}
+		unencChunks := applyXorCipher(kl, chunks)
 		r := rebuildString(unencChunks)
 		var score int
 		for _, b := range r {
-			score += getCharWeight(b)
+			score += GetCharWeight(b)
 		}
 		if score > retstre {
 			ret = r
@@ -76,7 +59,7 @@ func XorDecryptFile(file string) ([]byte, error) {
 		}
 
 	}
-	return ret, nil
+	return ret
 }
 
 func rebuildString(unencChunks [][]byte) []byte {
@@ -91,18 +74,13 @@ func rebuildString(unencChunks [][]byte) []byte {
 	return r
 }
 
-func applyXorCipher(kl int, chunks [][]byte) ([][]byte, []byte, error) {
+func applyXorCipher(kl int, chunks [][]byte) [][]byte {
 	unencChunks := make([][]byte, kl)
 	for i, c := range chunks {
-		hb := make([]byte, hex.EncodedLen(len(c)))
-		hex.Encode(hb, c)
-		s, _, err := SingleXorCipher(hb)
-		if err != nil {
-			return nil, nil, err
-		}
+		s, _ := SingleCharDecode(c)
 		unencChunks[i] = s
 	}
-	return unencChunks, nil, nil
+	return unencChunks
 }
 
 func makeByteChunks(kl int, ueb []byte) [][]byte {

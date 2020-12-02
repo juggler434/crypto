@@ -1,10 +1,16 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
+	"encoding/base64"
 	"fmt"
+	"github.com/juggler434/crypto/aes128/ecb"
+	"github.com/juggler434/crypto/encoding/hex"
+	"github.com/juggler434/crypto/xor"
+	"io/ioutil"
 	"os"
-
-	cryptopals "github.com/juggler434/crypto/set1"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -33,7 +39,7 @@ func init() {
 	set1Challenge4.Flags().StringVarP(&fileName, "file", "", "", "Text file location")
 	set1Challenge5.Flags().StringVarP(&plainText, "input", "", "", "Text to encrpyt")
 	set1Challenge5.Flags().StringVarP(&key, "key", "", "", "Key for encrypting text")
-	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "","File to be decrypted")
+	set1Challenge6.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&fileName, "file", "", "", "File to be decrypted")
 	set1Challenge7.Flags().StringVarP(&key, "key", "", "", "Key for encrypted text")
 	set1Challenge8.Flags().StringVarP(&fileName, "file", "", "", "File to detect encryption in")
@@ -54,7 +60,7 @@ var set1Challenge1 = &cobra.Command{
 	Short: "runs hex to base64 encoding",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.HexToBase64([]byte(hexString))
+		ret, err := hex.ToBase64([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -68,12 +74,23 @@ var set1Challenge2 = &cobra.Command{
 	Short: "performs fixed xor comparison on two hex encoded strings",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.FixedXor([]byte(hexString), []byte(hexString2))
+		input1, err := hex.Decode([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		fmt.Printf("%s\n", ret)
+		input2, err := hex.Decode([]byte(hexString2))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ret, err := xor.Fixed(input1, input2)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		res := hex.Encode(ret)
+		fmt.Printf("%s\n", res)
 	},
 }
 
@@ -82,11 +99,12 @@ var set1Challenge3 = &cobra.Command{
 	Short: "performs a single byte xor cipher on hex encoded string",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, _, err := cryptopals.SingleXorCipher([]byte(hexString))
+		inp, err := hex.Decode([]byte(hexString))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		ret, _ := xor.SingleCharDecode([]byte(inp))
 		fmt.Printf("%s\n", ret)
 	},
 }
@@ -96,11 +114,24 @@ var set1Challenge4 = &cobra.Command{
 	Short: "finds which string has been single xor encoded in a file",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.FindXorCipherString(fileName)
+		var input [][]byte
+		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		lns := strings.Split(string(f), "\n")
+		for _, ln := range lns {
+			dhl, err := hex.Decode([]byte(ln))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			input = append(input, dhl)
+		}
+		ret := xor.DetectSingleCharEncryption(input)
 		fmt.Printf("%s\n", ret)
 	},
 }
@@ -111,35 +142,54 @@ var set1Challenge5 = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(plainText)
-		ret, err := cryptopals.EncryptWithRepeatingXor([]byte(plainText), []byte(key))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		ret := xor.EncryptWithRepeatingKey([]byte(plainText), []byte(key))
+
+		ret = hex.Encode(ret)
 		fmt.Printf("%s\n", ret)
 	},
 }
 
 var set1Challenge6 = &cobra.Command{
-	Use: "challenge6",
+	Use:   "challenge6",
 	Short: "Decrypt a Base64 encoded repeating XOR encoded file",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.XorDecryptFile(fileName)
+		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		ueb = bytes.Trim(ueb, "\x00")
+		ret := xor.Decrypt(ueb)
 		fmt.Printf("%s\n", ret)
 	},
 }
 
 var set1Challenge7 = &cobra.Command{
-	Use: "challenge7",
+	Use:   "challenge7",
 	Short: "Decrypt and AES ECB 128 encrypted file that has been base64 encoded",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		ret, err := cryptopals.DecryptAES128Ecb(fileName, []byte(key))
+		f, err := ioutil.ReadFile(fileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+		_, err = base64.StdEncoding.Decode(ueb, f)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		ret, err := ecb.Decrypt(ueb, []byte(key))
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -149,14 +199,29 @@ var set1Challenge7 = &cobra.Command{
 }
 
 var set1Challenge8 = &cobra.Command{
-	Use: "challenge8",
+	Use:   "challenge8",
 	Short: "Find AES encrypted line in a file",
-	Long: "",
+	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := cryptopals.DetectECBEncryption(fileName)
+		var input [][]byte
+		f, err := ioutil.ReadFile(fileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		scanner := bufio.NewScanner(bytes.NewReader(f))
+		for scanner.Scan() {
+			hdl, err := hex.Decode(scanner.Bytes())
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			input = append(input, hdl)
+		}
+		res := ecb.Detect(input)
+		fmt.Printf("%d", res)
+
 	},
 }
