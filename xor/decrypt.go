@@ -37,7 +37,7 @@ func getKeyLengths(input []byte) []keyLength {
 	return kl
 }
 
-func Decrypt(encryptedBytes []byte) ([]byte, error) {
+func Decrypt(encryptedBytes []byte) []byte {
 
 	kls := getKeyLengths(encryptedBytes)
 
@@ -59,7 +59,7 @@ func Decrypt(encryptedBytes []byte) ([]byte, error) {
 		}
 
 	}
-	return ret, nil
+	return ret
 }
 
 func rebuildString(unencChunks [][]byte) []byte {

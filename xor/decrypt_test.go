@@ -10,40 +10,67 @@ import (
 )
 
 func TestGetHammingDistance(t *testing.T) {
-	s1 := []byte("this is a test")
-	s2 := []byte("wokka wokka!!!")
-	expected := 37
-
-	r := getHammingDistance(s1, s2)
-	if r != expected {
-		t.Errorf("Expected: %d, got: %d", expected, r)
+	tests := []struct {
+		name           string
+		input1         []byte
+		input2         []byte
+		expectedOutput int
+	}{
+		{
+			name:           "base case",
+			input1:         []byte("this is a test"),
+			input2:         []byte("wokka wokka!!!"),
+			expectedOutput: 37,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			r := getHammingDistance(test.input1, test.input2)
+			if r != test.expectedOutput {
+				t.Errorf("expected: %d, got: %d", test.expectedOutput, r)
+			}
+		})
 	}
 }
 
 func TestDecrypt(t *testing.T) {
-	t.Run("with valid input", func(t *testing.T) {
-		f, err := ioutil.ReadFile(BreakXorTestFile)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-		_, err = base64.StdEncoding.Decode(ueb, f)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+	tests := []struct {
+		name           string
+		inputFile      string
+		expectedOutput []byte
+	}{
+		{
+			name:           "base case",
+			inputFile:      BreakXorTestFile,
+			expectedOutput: []byte(BreakXorOutput),
+		},
+	}
 
-		ueb = bytes.Trim(ueb, "\x00")
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			f, err := ioutil.ReadFile(test.inputFile)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
+			_, err = base64.StdEncoding.Decode(ueb, f)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
 
-		r, err := Decrypt(ueb)
-		if err != nil {
-			t.Errorf("Expected err to be nil, got: %s", err)
-		}
-		if string(r) != BreakXorOutput {
-			t.Errorf("Expected: %s, got: %s", BreakXorOutput, r)
-		}
-	})
+			ueb = bytes.Trim(ueb, "\x00")
+
+			r := Decrypt(ueb)
+			if err != nil {
+				t.Errorf("Expected err to be nil, got: %s", err)
+			}
+			if !bytes.Equal(r, test.expectedOutput) {
+				t.Errorf("Expected: %s, got: %s", test.expectedOutput, r)
+			}
+		})
+	}
 }
 
 const BreakXorOutput = `Ah, look at all the lonely people

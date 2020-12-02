@@ -142,11 +142,8 @@ var set1Challenge5 = &cobra.Command{
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println(plainText)
-		ret, err := xor.EncryptWithRepeatingKey([]byte(plainText), []byte(key))
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		ret := xor.EncryptWithRepeatingKey([]byte(plainText), []byte(key))
+
 		ret = hex.Encode(ret)
 		fmt.Printf("%s\n", ret)
 	},
@@ -170,11 +167,7 @@ var set1Challenge6 = &cobra.Command{
 		}
 
 		ueb = bytes.Trim(ueb, "\x00")
-		ret, err := xor.Decrypt(ueb)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		ret := xor.Decrypt(ueb)
 		fmt.Printf("%s\n", ret)
 	},
 }

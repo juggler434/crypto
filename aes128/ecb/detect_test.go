@@ -53,7 +53,7 @@ func TestDetect(t *testing.T) {
 			res := Detect(input)
 
 			if res != test.expectedOutput {
-				t.Errorf("Expected %d, got %d", test.expectedOutput, res)
+				t.Errorf("expected %d, got %d", test.expectedOutput, res)
 			}
 		})
 
