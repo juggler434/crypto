@@ -9,8 +9,10 @@ import (
 )
 
 const (
-	ECBEncryptedLine = 2
-	ValidTestFile    = "./test_files/ecb_detection_test.txt"
+	ECBEncryptedLine        = 2
+	ValidTestFile           = "./test_files/ecb_detection_test.txt"
+	ECBEncryptedLineReverse = 1
+	ValidReverseTestFile    = "./test_files/ecb_detection_reverse_test.txt"
 )
 
 func TestDetect(t *testing.T) {
@@ -23,6 +25,11 @@ func TestDetect(t *testing.T) {
 			name:           "base case",
 			inputFile:      ValidTestFile,
 			expectedOutput: ECBEncryptedLine,
+		},
+		{
+			name:           "reverse lines for min test",
+			inputFile:      ValidReverseTestFile,
+			expectedOutput: ECBEncryptedLineReverse,
 		},
 	}
 
