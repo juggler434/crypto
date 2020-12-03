@@ -2,19 +2,29 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/juggler434/crypto/aes128/cbc"
+	"github.com/juggler434/crypto/encoding/base64"
 	"github.com/juggler434/crypto/padding"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"os"
 )
 
 var input string
 var blockLength int
+var file string
+var initializationVector string
 
 func init() {
 	rootCmd.AddCommand(set2Command)
 	set2Command.AddCommand(set2Challenge9)
+	set2Command.AddCommand(set2Challenge10)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
+	set2Challenge10.Flags().StringVarP(&file, "file", "", "", "Path to file")
+	set2Challenge10.Flags().StringVarP(&key, "key", "", "", "key to encrypt/decrypt with")
+	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "0000000000000000", "initialization vector to start for encryption")
 
 }
 
@@ -34,5 +44,44 @@ var set2Challenge9 = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		res := padding.PKCS7([]byte(input), blockLength)
 		fmt.Printf("%+q\n", res)
+	},
+}
+
+var set2Challenge10 = &cobra.Command{
+	Use:   "challenge10",
+	Short: "runs cbc encryption or decryption",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) != 1 {
+			fmt.Println("must be run with either encrypt or decrypt")
+			os.Exit(1)
+		}
+
+		input, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Printf("failed to read file contents: %s", err)
+		}
+
+		switch action := args[0]; action {
+		case "encrypt":
+			res, err := cbc.Encrypt(input, []byte(key), []byte(initializationVector))
+			if err != nil {
+				fmt.Printf("failed to encrypt input: %s", err)
+				os.Exit(1)
+			}
+			fmt.Printf("%s\n", base64.Encode(res))
+		case "decrypt":
+			b64input, err := base64.Decode(input)
+			if err != nil {
+				fmt.Printf("failed to decode base 64 input: %s", err)
+				os.Exit(1)
+			}
+			res, err := cbc.Decrypt(b64input, []byte(key), []byte(initializationVector))
+			if err != nil {
+				fmt.Printf("failed to decrypt input: %s", err)
+				os.Exit(1)
+			}
+			fmt.Printf("%s\n", res)
+		}
 	},
 }
