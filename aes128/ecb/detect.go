@@ -11,18 +11,7 @@ func Detect(encryptedLines [][]byte) int {
 	var ct []byte
 
 	for i, ln := range encryptedLines {
-		dia := 0
-		chunks := make([][]byte, 0)
-		for j := 0; j < len(ln); j += 16 {
-			batch := ln[j:min(j+15, len(ln))]
-			for _, c := range chunks {
-				if bytes.Equal(c, batch) {
-					dia += 1
-					break
-				}
-			}
-			chunks = append(chunks, batch)
-		}
+		dia := FindRepeats(ln)
 		if dia > dups {
 			dups = dia
 			res = i + 1
@@ -31,6 +20,22 @@ func Detect(encryptedLines [][]byte) int {
 	fmt.Println(ct)
 	fmt.Printf("Line Number: %d \n", res)
 	return res
+}
+
+func FindRepeats(ln []byte) int {
+	dia := 0
+	chunks := make([][]byte, 0)
+	for j := 0; j < len(ln); j += 16 {
+		batch := ln[j:min(j+15, len(ln))]
+		for _, c := range chunks {
+			if bytes.Equal(c, batch) {
+				dia += 1
+				break
+			}
+		}
+		chunks = append(chunks, batch)
+	}
+	return dia
 }
 
 func min(a, b int) int {

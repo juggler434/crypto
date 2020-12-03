@@ -24,7 +24,7 @@ func init() {
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
 	set2Challenge10.Flags().StringVarP(&file, "file", "", "", "Path to file")
 	set2Challenge10.Flags().StringVarP(&key, "key", "", "", "key to encrypt/decrypt with")
-	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "0000000000000000", "initialization vector to start for encryption")
+	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", "initialization vector to start for encryption")
 
 }
 
