@@ -4,21 +4,17 @@ import (
 	"crypto/aes"
 	"github.com/juggler434/crypto/aes128/cbc"
 	"math/rand"
+	"time"
 )
 
 // RandomEncrypt will generate a random key, prepend and append random bytes to the text, and encrypt under either ecb or cbc
 func RandomEncrypt(plainText []byte) ([]byte, int, error) {
-	// GenerateKey random key
-	// prepend 5-10 bytes to plaintext
-	// append 5 - 10 bytes to plaintext
-	// randomly choose between ecb or cbc
-	// encrypt the data
-	// return encrypted test, key, encryption type, error
 	key, err := GenerateKey()
 	if err != nil {
 		return nil, -1, err
 	}
 
+	rand.Seed(time.Now().UnixNano())
 	ppLen := rand.Intn(6) + 5
 	apLen := rand.Intn(6) + 5
 
@@ -30,7 +26,7 @@ func RandomEncrypt(plainText []byte) ([]byte, int, error) {
 	ap := make([]byte, apLen)
 	ft = append(ft, ap...)
 
-	et := rand.Intn(1)
+	et := rand.Intn(2)
 	switch et {
 	case ECB:
 		//TODO Make an encrypt function for this

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/juggler434/crypto/aes128"
 	"github.com/juggler434/crypto/aes128/cbc"
 	"github.com/juggler434/crypto/encoding/base64"
 	"github.com/juggler434/crypto/padding"
@@ -19,12 +20,14 @@ func init() {
 	rootCmd.AddCommand(set2Command)
 	set2Command.AddCommand(set2Challenge9)
 	set2Command.AddCommand(set2Challenge10)
+	set2Command.AddCommand(set2Challenge11)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
 	set2Challenge10.Flags().StringVarP(&file, "file", "", "", "Path to file")
 	set2Challenge10.Flags().StringVarP(&key, "key", "", "", "key to encrypt/decrypt with")
 	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", "initialization vector to start for encryption")
+	set2Challenge11.Flags().StringVarP(&file, "file", "", "", "file to encrypt and detect")
 
 }
 
@@ -83,5 +86,27 @@ var set2Challenge10 = &cobra.Command{
 			}
 			fmt.Printf("%s\n", res)
 		}
+	},
+}
+
+var set2Challenge11 = &cobra.Command{
+	Use:   "challenge11",
+	Short: "",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		input, err := ioutil.ReadFile(file)
+		if err != nil {
+			fmt.Printf("failed to read file: %s", err)
+			os.Exit(1)
+		}
+
+		encryptedText, encryptionPattern, err := aes128.RandomEncrypt(input)
+		if err != nil {
+			fmt.Printf("failed to encrypt file: %s", err)
+		}
+
+		fmt.Printf("Encrypted file using: %d\n", encryptionPattern)
+		dp := aes128.Oracle(encryptedText)
+		fmt.Printf("Oracle detected: %d\n", dp)
 	},
 }
