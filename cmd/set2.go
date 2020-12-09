@@ -106,7 +106,7 @@ var set2Challenge11 = &cobra.Command{
 		}
 
 		fmt.Printf("Encrypted file using: %d\n", encryptionPattern)
-		dp := aes128.Oracle(encryptedText)
-		fmt.Printf("Oracle detected: %d\n", dp)
+		dp := aes128.DetectMode(encryptedText)
+		fmt.Printf("DetectMode detected: %d\n", dp)
 	},
 }

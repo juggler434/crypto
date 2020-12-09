@@ -1,4 +1,4 @@
-package aes128
+package oracle
 
 import (
 	"crypto/rand"

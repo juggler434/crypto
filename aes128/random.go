@@ -3,13 +3,14 @@ package aes128
 import (
 	"crypto/aes"
 	"github.com/juggler434/crypto/aes128/cbc"
+	"github.com/juggler434/crypto/aes128/oracle"
 	"math/rand"
 	"time"
 )
 
 // RandomEncrypt will generate a random key, prepend and append random bytes to the text, and encrypt under either ecb or cbc
 func RandomEncrypt(plainText []byte) ([]byte, int, error) {
-	key, err := GenerateKey()
+	key, err := oracle.GenerateKey()
 	if err != nil {
 		return nil, -1, err
 	}
@@ -39,7 +40,7 @@ func RandomEncrypt(plainText []byte) ([]byte, int, error) {
 		cipher.Encrypt(ret, ft)
 		return ft, ECB, nil
 	case CBC:
-		iv, err := GenerateKey() //Initialization Vector is pretty similar to a key
+		iv, err := oracle.GenerateKey() //Initialization Vector is pretty similar to a key
 		if err != nil {
 			return nil, -1, err
 		}

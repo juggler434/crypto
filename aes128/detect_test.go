@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestOracle(t *testing.T) {
+func TestDetectMode(t *testing.T) {
 	tests := []struct {
 		name           string
 		input          []byte
@@ -30,7 +30,7 @@ func TestOracle(t *testing.T) {
 				t.Errorf("failed to decode test input: %s", err)
 			}
 
-			res := Oracle(decodedInput)
+			res := DetectMode(decodedInput)
 			if res != test.encryptionType {
 				t.Errorf("expected: %d, got: %d", test.encryptionType, res)
 			}

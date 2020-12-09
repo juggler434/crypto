@@ -1,6 +1,8 @@
 package aes128
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestRandomEncrypt(t *testing.T) {
 	tests := []struct {
