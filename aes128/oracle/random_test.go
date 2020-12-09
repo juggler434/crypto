@@ -1,8 +1,10 @@
-package aes128
+package oracle
 
-import "testing"
+import (
+	"testing"
+)
 
-func TestRandomEncrypt(t *testing.T) {
+func TestRandom_Encrypt(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       []byte
@@ -17,7 +19,8 @@ func TestRandomEncrypt(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			res, et, err := RandomEncrypt(test.input)
+			o := NewRandom()
+			res, et, err := o.Encrypt(test.input)
 			if test.shouldError {
 				if err == nil {
 					t.Error("expected: error, got: nil")

@@ -7,8 +7,8 @@ const (
 	CBC
 )
 
-// Oracle takes in encrypted text, and returns whether it is ECB or CBC encoded
-func Oracle(encryptedText []byte) int {
+// DetectMode takes in encrypted text, and returns whether it is ECB or CBC encoded
+func DetectMode(encryptedText []byte) int {
 	rl := ecb.FindRepeats(encryptedText)
 	if rl > 0 {
 		return ECB

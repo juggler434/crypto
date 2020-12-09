@@ -1,4 +1,4 @@
-package aes128
+package oracle
 
 import (
 	"crypto/aes"
@@ -7,13 +7,25 @@ import (
 	"time"
 )
 
-// RandomEncrypt will generate a random key, prepend and append random bytes to the text, and encrypt under either ecb or cbc
-func RandomEncrypt(plainText []byte) ([]byte, int, error) {
+const (
+	ECB = iota
+	CBC
+)
+
+type Random struct {
+	key []byte
+}
+
+func NewRandom() *Random {
 	key, err := GenerateKey()
 	if err != nil {
-		return nil, -1, err
+		panic(err)
 	}
+	return &Random{key: key}
+}
 
+// RandomEncrypt will generate a random key, prepend and append random bytes to the text, and encrypt under either ecb or cbc
+func (o *Random) Encrypt(plainText []byte) ([]byte, int, error) {
 	rand.Seed(time.Now().UnixNano())
 	ppLen := rand.Intn(6) + 5
 	apLen := rand.Intn(6) + 5
@@ -30,7 +42,7 @@ func RandomEncrypt(plainText []byte) ([]byte, int, error) {
 	switch et {
 	case ECB:
 		//TODO Make an encrypt function for this
-		cipher, err := aes.NewCipher(key)
+		cipher, err := aes.NewCipher(o.key)
 		if err != nil {
 			return nil, -1, err
 		}
@@ -43,7 +55,7 @@ func RandomEncrypt(plainText []byte) ([]byte, int, error) {
 		if err != nil {
 			return nil, -1, err
 		}
-		et, err := cbc.Encrypt(ft, key, iv)
+		et, err := cbc.Encrypt(ft, o.key, iv)
 		if err != nil {
 			return nil, -1, err
 		}

@@ -1,6 +1,8 @@
-package aes128
+package oracle
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGenerate(t *testing.T) {
 	tests := []struct {
