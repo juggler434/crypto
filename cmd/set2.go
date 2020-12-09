@@ -103,7 +103,8 @@ var set2Challenge11 = &cobra.Command{
 			os.Exit(1)
 		}
 
-		encryptedText, encryptionPattern, err := oracle.RandomEncrypt(input)
+		ro := oracle.NewRandom()
+		encryptedText, encryptionPattern, err := ro.Encrypt(input)
 		if err != nil {
 			fmt.Printf("failed to encrypt file: %s", err)
 		}
