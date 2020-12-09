@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/juggler434/crypto/aes128"
 	"github.com/juggler434/crypto/aes128/cbc"
+	"github.com/juggler434/crypto/aes128/oracle"
 	"github.com/juggler434/crypto/encoding/base64"
 	"github.com/juggler434/crypto/padding"
 	"github.com/spf13/cobra"
@@ -21,6 +22,7 @@ func init() {
 	set2Command.AddCommand(set2Challenge9)
 	set2Command.AddCommand(set2Challenge10)
 	set2Command.AddCommand(set2Challenge11)
+	set2Command.AddCommand(set2Challenge12)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
@@ -28,6 +30,7 @@ func init() {
 	set2Challenge10.Flags().StringVarP(&key, "key", "", "", "key to encrypt/decrypt with")
 	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", "initialization vector to start for encryption")
 	set2Challenge11.Flags().StringVarP(&file, "file", "", "", "file to encrypt and detect")
+	set2Challenge12.Flags().StringVarP(&input, "input", "", "", "Input to run oracle on")
 
 }
 
@@ -100,7 +103,7 @@ var set2Challenge11 = &cobra.Command{
 			os.Exit(1)
 		}
 
-		encryptedText, encryptionPattern, err := aes128.RandomEncrypt(input)
+		encryptedText, encryptionPattern, err := oracle.RandomEncrypt(input)
 		if err != nil {
 			fmt.Printf("failed to encrypt file: %s", err)
 		}
@@ -108,5 +111,25 @@ var set2Challenge11 = &cobra.Command{
 		fmt.Printf("Encrypted file using: %d\n", encryptionPattern)
 		dp := aes128.DetectMode(encryptedText)
 		fmt.Printf("DetectMode detected: %d\n", dp)
+	},
+}
+
+var set2Challenge12 = &cobra.Command{
+	Use:   "challenge12",
+	Short: "",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		di, err := base64.Decode([]byte(input))
+		if err != nil {
+			fmt.Printf("failed to base64 decode input: %s", err)
+			os.Exit(1)
+		}
+
+		ret, err := aes128.BreakECBSimple(di)
+		if err != nil {
+			fmt.Printf("failed to break ECS encryption: %s", err)
+			os.Exit(1)
+		}
+		fmt.Printf("%s\n", ret)
 	},
 }
