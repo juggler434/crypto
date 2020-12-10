@@ -2,6 +2,6 @@ package account
 
 type Account struct {
 	email []byte
-	uid   int
+	uid   []byte
 	role  []byte
 }
