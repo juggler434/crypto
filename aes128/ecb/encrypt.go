@@ -14,7 +14,12 @@ func Encrypt(plaintext, key []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	ret := make([]byte, len(pi))
-	cipher.Encrypt(ret, pi)
+	ret := make([]byte, 0)
+
+	for eb, db := 0, 16; eb < len(pi); eb, db = eb+len(key), db+len(key) {
+		b := make([]byte, bs)
+		cipher.Encrypt(b, pi[eb:db])
+		ret = append(ret, b...)
+	}
 	return ret, nil
 }

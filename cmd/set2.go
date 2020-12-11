@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/juggler434/crypto/account"
 	"github.com/juggler434/crypto/aes128"
 	"github.com/juggler434/crypto/aes128/cbc"
 	"github.com/juggler434/crypto/aes128/oracle"
@@ -23,6 +24,7 @@ func init() {
 	set2Command.AddCommand(set2Challenge10)
 	set2Command.AddCommand(set2Challenge11)
 	set2Command.AddCommand(set2Challenge12)
+	set2Command.AddCommand(set2Challenge13)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
@@ -31,6 +33,7 @@ func init() {
 	set2Challenge10.Flags().StringVarP(&initializationVector, "iv", "", "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00", "initialization vector to start for encryption")
 	set2Challenge11.Flags().StringVarP(&file, "file", "", "", "file to encrypt and detect")
 	set2Challenge12.Flags().StringVarP(&input, "input", "", "", "Input to run oracle on")
+	set2Challenge13.Flags().StringVarP(&input, "input", "", "", "email trying to access admin panel")
 
 }
 
@@ -132,5 +135,38 @@ var set2Challenge12 = &cobra.Command{
 			os.Exit(1)
 		}
 		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set2Challenge13 = &cobra.Command{
+	Use:   "challenge13",
+	Short: "",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Checking email to see if allowed access to admin panel")
+		us := account.NewUserService()
+		var ret []byte
+		var err error
+		if input == "hack the planet" {
+			ret = account.Attack(us)
+		} else {
+			ret, err = us.GetUser([]byte(input))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		}
+
+		allowed, err := us.CheckAdminPermission(ret)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		if !allowed {
+			fmt.Println("Access denied")
+		} else {
+			fmt.Println("Here are all the things!")
+		}
+
 	},
 }

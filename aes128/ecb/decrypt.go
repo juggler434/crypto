@@ -5,17 +5,17 @@ import (
 	"crypto/aes"
 )
 
-func Decrypt(cypherText, key []byte)([]byte, error) {
+func Decrypt(cypherText, key []byte) ([]byte, error) {
 	plainText, err := decryptEcb(cypherText, key)
 	if err != nil {
 		return nil, err
 	}
 
-	plainText = bytes.Trim(plainText, "\x04")
+	plainText = bytes.Trim(plainText, "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f")
 	return plainText, nil
 }
 
-func decryptEcb(ueb []byte,  key []byte) ([]byte,  error) {
+func decryptEcb(ueb []byte, key []byte) ([]byte, error) {
 	ueb = bytes.Trim(ueb, "\x00")
 
 	cipher, err := aes.NewCipher(key)
