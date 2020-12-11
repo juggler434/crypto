@@ -3,7 +3,6 @@ package ecb
 import (
 	"bytes"
 	"encoding/base64"
-	"fmt"
 	"io/ioutil"
 	"testing"
 )
@@ -55,15 +54,15 @@ func TestDecrypt(t *testing.T) {
 				}
 			}
 
-			for i, b := range test.expectedReturn {
-				if res[i] != b {
-					fmt.Printf("The res char is: %d. the expected char is :%d, the index is: %d", b, res[i], i)
-					break
-				}
-			}
+			//for i, b := range test.expectedReturn {
+			//	if res[i] != b {
+			//		fmt.Printf("The res char is: %d. the expected char is :%d, the index is: %d", b, res[i], i)
+			//		break
+			//	}
+			//}
 
 			if !bytes.Equal(res, test.expectedReturn) {
-				t.Errorf("Expected: %s, got: %s", ExpectedAESReturn, res)
+				t.Errorf("Expected: %+q, got: %+q", ExpectedAESReturn, res)
 			}
 		})
 	}
@@ -175,5 +174,4 @@ Play that funky music Come on, Come on, let me hear
 Play that funky music white boy you say it, say it 
 Play that funky music A little louder now 
 Play that funky music, white boy Come on, Come on, Come on 
-Play that funky music 
-`
+Play that funky music `
