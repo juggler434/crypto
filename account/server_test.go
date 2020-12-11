@@ -58,3 +58,53 @@ func TestUserService_GetUser(t *testing.T) {
 		})
 	}
 }
+
+func TestUserService_CheckAdminPermission(t *testing.T) {
+	tests := []struct {
+		name           string
+		input          []byte
+		expectedOutput bool
+		shouldErr      bool
+	}{
+		{
+			name:           "not admin account",
+			input:          []byte("email=test@test.com&uid=10&role=user"),
+			expectedOutput: false,
+			shouldErr:      false,
+		}, {
+			name:           "admin account",
+			input:          []byte("email=test@test.com&uid=10&role=admin"),
+			expectedOutput: true,
+			shouldErr:      false,
+		}, {
+			name:           "invalid input",
+			input:          []byte("}["),
+			expectedOutput: false,
+			shouldErr:      true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			us := NewUserService()
+			ei, err := ecb.Encrypt(test.input, us.key)
+			if err != nil {
+				t.Errorf("unexpected error: %s", err)
+			}
+			res, err := us.CheckAdminPermission(ei)
+			if test.shouldErr {
+				if err == nil {
+					t.Error("expected: error, got: nil")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("expected: nil error, got: %s", err)
+				}
+			}
+
+			if res != test.expectedOutput {
+				t.Errorf("expected: %t, got %t", test.expectedOutput, res)
+			}
+		})
+	}
+}

@@ -1,6 +1,7 @@
 package account
 
 import (
+	"bytes"
 	"github.com/juggler434/crypto/aes128/ecb"
 	"github.com/juggler434/crypto/aes128/oracle"
 )
@@ -24,4 +25,18 @@ func (us *UserService) GetUser(email []byte) ([]byte, error) {
 		return nil, err
 	}
 	return ret, nil
+}
+
+func (us *UserService) CheckAdminPermission(encryptedCookie []byte) (bool, error) {
+	uc, err := ecb.Decrypt(encryptedCookie, us.key)
+	if err != nil {
+		return false, err
+	}
+
+	a, err := Parse(uc)
+	if err != nil {
+		return false, err
+	}
+	isAdmin := bytes.Equal(a.role, []byte("admin"))
+	return isAdmin, nil
 }
