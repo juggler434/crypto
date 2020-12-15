@@ -10,16 +10,15 @@ func Encrypt(plaintext, key []byte) ([]byte, error) {
 	pi := padding.PKCS7(plaintext, bs)
 
 	cipher, err := aes.NewCipher(key)
+
 	if err != nil {
 		return nil, err
 	}
 
-	ret := make([]byte, 0)
+	ret := make([]byte, len(pi))
 
-	for eb, db := 0, 16; eb < len(pi); eb, db = eb+len(key), db+len(key) {
-		b := make([]byte, bs)
-		cipher.Encrypt(b, pi[eb:db])
-		ret = append(ret, b...)
+	for eb, db := 0, 16; eb < len(pi); eb, db = eb+16, db+16 {
+		cipher.Encrypt(ret[eb:db], pi[eb:db])
 	}
 	return ret, nil
 }

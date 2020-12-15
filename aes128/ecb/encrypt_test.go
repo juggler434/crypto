@@ -18,7 +18,7 @@ func TestEncrypt(t *testing.T) {
 			name:           "base case",
 			input:          []byte("THIS IS A TEST!!"),
 			key:            []byte("YELLOW SUBMARINE"),
-			expectedOutput: []byte("dgdvTfIWW2IBN+w+g8xLcw=="),
+			expectedOutput: []byte("dgdvTfIWW2IBN+w+g8xLc2D6NnB+RfSZ26DyW5IjAaU="),
 			shouldErr:      false,
 		},
 		{
@@ -34,6 +34,13 @@ func TestEncrypt(t *testing.T) {
 			key:            []byte("YELLOW SUBMARIN"),
 			expectedOutput: nil,
 			shouldErr:      true,
+		},
+		{
+			name:           "double block length",
+			input:          []byte("THIS IS A TEST!!THIS IS A TEST!!"),
+			key:            []byte("YELLOW SUBMARINE"),
+			expectedOutput: []byte("dgdvTfIWW2IBN+w+g8xLc3YHb03yFltiATfsPoPMS3Ng+jZwfkX0mdug8luSIwGl"),
+			shouldErr:      false,
 		},
 	}
 

@@ -129,7 +129,9 @@ var set2Challenge12 = &cobra.Command{
 			os.Exit(1)
 		}
 
-		ret, err := aes128.BreakECBSimple(di)
+		server := oracle.NewECBOracle(di)
+		ret, err := aes128.BreakECBSimple(server)
+
 		if err != nil {
 			fmt.Printf("failed to break ECS encryption: %s", err)
 			os.Exit(1)

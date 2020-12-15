@@ -26,7 +26,7 @@ func TestPKCS7(t *testing.T) {
 			name:           "input multiple of block size",
 			input:          []byte("YELLOW SUBMARINE"),
 			blockSize:      4,
-			expectedOutput: []byte("YELLOW SUBMARINE"),
+			expectedOutput: []byte("YELLOW SUBMARINE\x04\x04\x04\x04"),
 		},
 	}
 
