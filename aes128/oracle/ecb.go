@@ -28,7 +28,7 @@ type AdvancedECBOracle struct {
 
 func NewAdvancedECBOracle(secret []byte) Encrypter {
 	rand.Seed(time.Now().UnixNano()) //seed our random generator
-	pl := rand.Int()
+	pl := rand.Intn(32)
 
 	prefix := make([]byte, pl)
 	rand.Read(prefix)
