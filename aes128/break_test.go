@@ -17,6 +17,16 @@ func TestBreakECBSimple(t *testing.T) {
 			input:     []byte("this is a test"),
 			shouldErr: false,
 		},
+		{
+			name:      "input longer than one block",
+			input:     []byte("SUPER SECRET API KEY"),
+			shouldErr: false,
+		},
+		{
+			name:      "input longer than one block",
+			input:     []byte("this is a test!!"),
+			shouldErr: false,
+		},
 	}
 
 	for _, test := range tests {
@@ -47,8 +57,18 @@ func TestBreakECBAdvanced(t *testing.T) {
 		shouldErr bool
 	}{
 		{
-			name:      "base case",
+			name:      "input shorter than one block",
 			input:     []byte("this is a test"),
+			shouldErr: false,
+		},
+		{
+			name:      "input longer than one block",
+			input:     []byte("SUPER SECRET API KEY"),
+			shouldErr: false,
+		},
+		{
+			name:      "input longer than one block",
+			input:     []byte("this is a test!!"),
 			shouldErr: false,
 		},
 	}
