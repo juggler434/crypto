@@ -41,7 +41,7 @@ func createAttackerEmail(blockSize int) []byte {
 }
 
 func createAdminPaddedEmail(blockSize int) []byte {
-	paddedAdmin := padding.PKCS7([]byte("admin"), blockSize)
+	paddedAdmin := pkcs7.Pad([]byte("admin"), blockSize)
 	emailHeaderLength := len([]byte("email="))
 	pad := make([]byte, abs(blockSize-emailHeaderLength))
 	for i := 0; i < len(pad); i++ {
