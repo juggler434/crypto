@@ -14,6 +14,9 @@ func Pad(input []byte, blockSize int) []byte {
 }
 
 func Unpad(input []byte) ([]byte, error) {
+	if input == nil || len(input) == 0 {
+		return nil, nil
+	}
 	pc := input[len(input)-1]
 	pl := int(pc)
 
@@ -28,6 +31,10 @@ func Unpad(input []byte) ([]byte, error) {
 }
 
 func checkPaddingIsValid(input []byte, paddingLength int) error {
+	if len(input) < paddingLength {
+		return errors.New("invalid padding")
+	}
+
 	p := input[len(input)-(paddingLength):]
 
 	for _, pc := range p {

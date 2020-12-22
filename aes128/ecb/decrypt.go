@@ -3,6 +3,7 @@ package ecb
 import (
 	"bytes"
 	"crypto/aes"
+	pkcs7 "github.com/juggler434/crypto/padding"
 )
 
 func Decrypt(cypherText, key []byte) ([]byte, error) {
@@ -11,7 +12,10 @@ func Decrypt(cypherText, key []byte) ([]byte, error) {
 		return nil, err
 	}
 
-	plainText = bytes.Trim(plainText, "\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f")
+	plainText, err = pkcs7.Unpad(plainText)
+	if err != nil {
+		return nil, err
+	}
 	return plainText, nil
 }
 
