@@ -7,7 +7,7 @@ import (
 )
 
 func BreakECBSimple(oracle oracle.Encrypter) ([]byte, error) {
-	bs, tl, err := findBlockSize(oracle, []byte(""))
+	bs, tl, err := findBlockSize(oracle, []byte(""), 0)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +28,7 @@ func BreakECBSimple(oracle oracle.Encrypter) ([]byte, error) {
 
 	res := make([]byte, 0)
 	for i := 0; i < tl; i++ {
-		cb := createInputDictionary(oracle, dictionarySeed, bs, 0)
+		cb := createInputDictionary(oracle, dictionarySeed, bs, 0, 0)
 		op, _ := oracle.Encrypt(padding)
 		hc := op[(numberOfBlocks-1)*bs : (numberOfBlocks * bs)]
 
@@ -47,7 +47,7 @@ func BreakECBSimple(oracle oracle.Encrypter) ([]byte, error) {
 }
 
 func BreakECBAdvanced(oracle oracle.Encrypter) ([]byte, error) {
-	bs, _, _ := findBlockSize(oracle, []byte(""))
+	bs, _, _ := findBlockSize(oracle, []byte(""), 0)
 	pl := findPrefixLen(oracle, bs)
 	prefixRemainder := pl % bs
 	prefixRemainder = bs - prefixRemainder
@@ -68,16 +68,16 @@ func BreakECBAdvanced(oracle oracle.Encrypter) ([]byte, error) {
 
 	dictionarySeed := append(align, padding...)
 
-	_, etl, _ := findBlockSize(oracle, align)
+	_, etl, _ := findBlockSize(oracle, align, pl)
 	res := make([]byte, 0)
 
 	for i := 0; i < etl; i++ {
-		cb := createInputDictionary(oracle, dictionarySeed, bs, len(align)+pl)
+		cb := createInputDictionary(oracle, dictionarySeed, bs, pl, prefixRemainder)
 		op, _ := oracle.Encrypt(append(align, padding...))
 		prefixPad := pl + prefixRemainder
-		startIndex := ((numberOfBlocks - 1) * bs) + prefixPad
-		endIndex := (numberOfBlocks * bs) + prefixPad
-		hc := op[startIndex:endIndex]
+		//startIndex := pl
+		endIndex := prefixPad + (numberOfBlocks * bs)
+		hc := op[prefixPad:endIndex]
 		for k, v := range cb {
 			if bytes.Equal(v, hc) {
 				res = append(res, k)
@@ -92,9 +92,9 @@ func BreakECBAdvanced(oracle oracle.Encrypter) ([]byte, error) {
 	return res, nil
 }
 
-func findBlockSize(encrypter oracle.Encrypter, buf []byte) (int, int, error) {
-	et, _ := encrypter.Encrypt([]byte(""))
-	bil := len(buf)
+func findBlockSize(encrypter oracle.Encrypter, buf []byte, padLength int) (int, int, error) {
+	et, _ := encrypter.Encrypt(buf)
+	//bil := len(buf)
 	for {
 		buf = append(buf, byte('A'))
 		ct, err := encrypter.Encrypt(buf)
@@ -104,7 +104,7 @@ func findBlockSize(encrypter oracle.Encrypter, buf []byte) (int, int, error) {
 		if len(ct) > len(et) {
 			blockSize := len(ct) - len(et)
 			noOfBlocks := len(et) / blockSize
-			cts := (noOfBlocks * blockSize) - (len(buf) - bil)
+			cts := (noOfBlocks * blockSize) - len(buf) - padLength
 			return blockSize, cts, nil
 		}
 	}
@@ -120,13 +120,13 @@ func detectECB(encrypter oracle.Encrypter, blockSize int) bool {
 	return DetectMode(res) == ECB
 }
 
-func createInputDictionary(encrypter oracle.Encrypter, input []byte, blockSize, prefixLength int) map[byte][]byte {
+func createInputDictionary(encrypter oracle.Encrypter, input []byte, blockSize, prefixLength, padRemainder int) map[byte][]byte {
 	id := make(map[byte][]byte)
 
 	for i := 0; i < 256; i++ {
 		ui := append(input, byte(i))
 		res, _ := encrypter.Encrypt(ui)
-		id[byte(i)] = res[prefixLength : len(input)+1]
+		id[byte(i)] = res[prefixLength+padRemainder : prefixLength+len(input)+1]
 	}
 
 	return id
