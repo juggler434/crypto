@@ -13,7 +13,7 @@ func Encrypt(plaintext, key, initializationVector []byte) ([]byte, error) {
 		return nil, err
 	}
 	res := make([]byte, 0)
-	pi := padding.PKCS7(plaintext, len(key))
+	pi := pkcs7.Pad(plaintext, len(key))
 
 	for eb, db := 0, 16; eb < len(pi); eb, db = eb+len(key), db+len(key) {
 		b, err := xor.Fixed(lb, pi[eb:db])

@@ -7,7 +7,7 @@ import (
 
 func Encrypt(plaintext, key []byte) ([]byte, error) {
 	bs := len(key)
-	pi := padding.PKCS7(plaintext, bs)
+	pi := pkcs7.Pad(plaintext, bs)
 
 	cipher, err := aes.NewCipher(key)
 

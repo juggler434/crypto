@@ -50,10 +50,10 @@ var set2Command = &cobra.Command{
 
 var set2Challenge9 = &cobra.Command{
 	Use:   "challenge9",
-	Short: "runs PKCS7 Padding",
+	Short: "runs Pad Padding",
 	Long:  "",
 	Run: func(cmd *cobra.Command, args []string) {
-		res := padding.PKCS7([]byte(input), blockLength)
+		res := pkcs7.Pad([]byte(input), blockLength)
 		fmt.Printf("%+q\n", res)
 	},
 }

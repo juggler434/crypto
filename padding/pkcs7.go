@@ -1,6 +1,8 @@
-package padding
+package pkcs7
 
-func PKCS7(input []byte, blockSize int) []byte {
+import "errors"
+
+func Pad(input []byte, blockSize int) []byte {
 	r := len(input) % blockSize
 	var pl int
 	pl = blockSize - r // This makes it so we won't pad input with the correct length
@@ -9,4 +11,36 @@ func PKCS7(input []byte, blockSize int) []byte {
 	}
 
 	return input
+}
+
+func Unpad(input []byte) ([]byte, error) {
+	if input == nil || len(input) == 0 {
+		return nil, nil
+	}
+	pc := input[len(input)-1]
+	pl := int(pc)
+
+	err := checkPaddingIsValid(input, pl)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return input[:len(input)-pl], nil
+
+}
+
+func checkPaddingIsValid(input []byte, paddingLength int) error {
+	if len(input) < paddingLength {
+		return errors.New("invalid padding")
+	}
+
+	p := input[len(input)-(paddingLength):]
+
+	for _, pc := range p {
+		if uint(pc) != uint(len(p)) {
+			return errors.New("invalid padding")
+		}
+	}
+	return nil
 }

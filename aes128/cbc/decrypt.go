@@ -2,6 +2,7 @@ package cbc
 
 import (
 	"crypto/aes"
+	pkcs7 "github.com/juggler434/crypto/padding"
 	"github.com/juggler434/crypto/xor"
 	"math"
 )
@@ -25,13 +26,11 @@ func Decrypt(input, key, initializationVector []byte) ([]byte, error) {
 			return nil, err
 		}
 
-		for _, by := range b {
-			if by > byte(16) { // 0 - 15 will be padding characters
-				res = append(res, by)
-			}
-		}
+		res = append(res, b...)
 		lb = input[eb:db]
 	}
+
+	res, err = pkcs7.Unpad(res)
 
 	return res, nil
 }
