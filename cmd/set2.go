@@ -25,6 +25,7 @@ func init() {
 	set2Command.AddCommand(set2Challenge11)
 	set2Command.AddCommand(set2Challenge12)
 	set2Command.AddCommand(set2Challenge13)
+	set2Command.AddCommand(set2Challenge14)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
@@ -34,6 +35,7 @@ func init() {
 	set2Challenge11.Flags().StringVarP(&file, "file", "", "", "file to encrypt and detect")
 	set2Challenge12.Flags().StringVarP(&input, "input", "", "", "Input to run oracle on")
 	set2Challenge13.Flags().StringVarP(&input, "input", "", "", "email trying to access admin panel")
+	set2Challenge14.Flags().StringVarP(&input, "input", "", "", "bit that is going to be encrypted (or if you're in the know, will get you a secret")
 
 }
 
@@ -170,5 +172,32 @@ var set2Challenge13 = &cobra.Command{
 			fmt.Println("Here are all the things!")
 		}
 
+	},
+}
+
+var set2Challenge14 = &cobra.Command{
+	Use:   "challenge14",
+	Short: "",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		encrypter := oracle.NewAdvancedECBOracle([]byte("SUPER SECRET API KEY"))
+		var ret []byte
+		var err error
+		if input == "hack the planet" {
+			ret, err = aes128.BreakECBAdvanced(encrypter)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else {
+			eb, err := encrypter.Encrypt([]byte(input))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			ret = base64.Encode(eb)
+		}
+
+		fmt.Printf("%s\n", ret)
 	},
 }
