@@ -52,30 +52,48 @@ func TestBreakECBSimple(t *testing.T) {
 
 func TestBreakECBAdvanced(t *testing.T) {
 	tests := []struct {
-		name      string
-		input     []byte
-		shouldErr bool
+		name           string
+		input          []byte
+		setupEncrypter func(secretText []byte) oracle.Encrypter
+		shouldErr      bool
 	}{
 		{
-			name:      "input shorter than one block",
-			input:     []byte("this is a test"),
+			name:  "input shorter than one block",
+			input: []byte("this is a test"),
+			setupEncrypter: func(secretText []byte) oracle.Encrypter {
+				return oracle.NewAdvancedECBOracle(secretText)
+			},
 			shouldErr: false,
 		},
 		{
-			name:      "input longer than one block",
-			input:     []byte("SUPER SECRET API KEY"),
+			name:  "input longer than one block",
+			input: []byte("SUPER SECRET API KEY"),
+			setupEncrypter: func(secretText []byte) oracle.Encrypter {
+				return oracle.NewAdvancedECBOracle(secretText)
+			},
 			shouldErr: false,
 		},
 		{
-			name:      "input longer than one block",
-			input:     []byte("this is a test!!"),
+			name:  "input longer than one block",
+			input: []byte("this is a test!!"),
+			setupEncrypter: func(secretText []byte) oracle.Encrypter {
+				return oracle.NewAdvancedECBOracle(secretText)
+			},
+			shouldErr: false,
+		},
+		{
+			name:  "will work with simple oracle",
+			input: []byte("this is a test!!"),
+			setupEncrypter: func(secretText []byte) oracle.Encrypter {
+				return oracle.NewECBOracle(secretText)
+			},
 			shouldErr: false,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			o := oracle.NewAdvancedECBOracle(test.input)
+			o := test.setupEncrypter(test.input)
 			ret, err := BreakECBAdvanced(o)
 			if test.shouldErr {
 				if err == nil {
