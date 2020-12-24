@@ -26,6 +26,7 @@ func init() {
 	set2Command.AddCommand(set2Challenge12)
 	set2Command.AddCommand(set2Challenge13)
 	set2Command.AddCommand(set2Challenge14)
+	set2Command.AddCommand(set2Challenge16)
 
 	set2Challenge9.Flags().StringVarP(&input, "input", "", "", "Input to Pad")
 	set2Challenge9.Flags().IntVarP(&blockLength, "length", "", 16, "desired block length")
@@ -36,7 +37,7 @@ func init() {
 	set2Challenge12.Flags().StringVarP(&input, "input", "", "", "Input to run oracle on")
 	set2Challenge13.Flags().StringVarP(&input, "input", "", "", "email trying to access admin panel")
 	set2Challenge14.Flags().StringVarP(&input, "input", "", "", "bit that is going to be encrypted (or if you're in the know, will get you a secret")
-
+	set2Challenge16.Flags().StringVarP(&input, "input", "", "", "post a comment (or hack our very secure system)")
 }
 
 var set2Command = &cobra.Command{
@@ -199,5 +200,45 @@ var set2Challenge14 = &cobra.Command{
 		}
 
 		fmt.Printf("%s\n", ret)
+	},
+}
+
+var set2Challenge16 = &cobra.Command{
+	Use:   "challenge16",
+	Short: "",
+	Long:  "",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Posting comment")
+		bfe := oracle.NewCommentEncrypter()
+		var aa bool
+		var ret []byte
+		var err error
+		if input == "hack the planet" {
+			aa, err = aes128.BitflipAttack(bfe)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+		} else {
+			res, err := bfe.Encrypt([]byte(input))
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+			aa, err = bfe.CheckIsAdmin(res)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+			ret = base64.Encode(res)
+		}
+		if aa {
+			fmt.Println("Welcome Administrator, let's do some damage")
+		} else {
+			fmt.Println("Thank you for your comment user")
+			fmt.Printf("%s\n", ret)
+		}
+
 	},
 }
