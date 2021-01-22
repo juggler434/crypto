@@ -3,9 +3,9 @@ package cmd
 import (
 	"bufio"
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"github.com/juggler434/crypto/aes128/ecb"
+	"github.com/juggler434/crypto/encoding/base64"
 	"github.com/juggler434/crypto/encoding/hex"
 	"github.com/juggler434/crypto/xor"
 	"io/ioutil"
@@ -159,8 +159,7 @@ var set1Challenge6 = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-		_, err = base64.StdEncoding.Decode(ueb, f)
+		ueb, err := base64.Decode(f)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -182,8 +181,8 @@ var set1Challenge7 = &cobra.Command{
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		ueb := make([]byte, base64.StdEncoding.DecodedLen(len(f)))
-		_, err = base64.StdEncoding.Decode(ueb, f)
+
+		ueb, err := base64.Decode(f)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -222,6 +221,5 @@ var set1Challenge8 = &cobra.Command{
 		}
 		res := ecb.Detect(input)
 		fmt.Printf("%d", res)
-
 	},
 }

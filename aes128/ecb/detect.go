@@ -26,7 +26,7 @@ func FindRepeats(ln []byte) int {
 	dia := 0
 	chunks := make([][]byte, 0)
 	for j := 0; j < len(ln); j += 16 {
-		batch := ln[j:min(j+15, len(ln))]
+		batch := ln[j : j+16]
 		for _, c := range chunks {
 			if bytes.Equal(c, batch) {
 				dia += 1
@@ -36,11 +36,4 @@ func FindRepeats(ln []byte) int {
 		chunks = append(chunks, batch)
 	}
 	return dia
-}
-
-func min(a, b int) int {
-	if a <= b {
-		return a
-	}
-	return b
 }
