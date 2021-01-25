@@ -1,6 +1,9 @@
 package base64
 
-import "encoding/base64"
+import (
+	"bytes"
+	"encoding/base64"
+)
 
 func Encode(plaintext []byte) []byte {
 	ret := make([]byte, base64.StdEncoding.EncodedLen(len(plaintext)))
@@ -14,5 +17,5 @@ func Decode(encodedBytes []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ret, nil
+	return bytes.Trim(ret, "\x00"), nil
 }

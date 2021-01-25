@@ -32,5 +32,5 @@ func Decrypt(input, key, initializationVector []byte) ([]byte, error) {
 
 	res, err = pkcs7.Unpad(res)
 
-	return res, nil
+	return res, err
 }
