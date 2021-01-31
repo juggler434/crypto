@@ -61,8 +61,8 @@ func TestUnpad(t *testing.T) {
 			input:          []byte("YELLOW SUBMARINE\x04\x04\x04"),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if _, ok := err.(*InvalidPaddingError); !ok {
-					t.Errorf("expected: %s, got: %s", &InvalidPaddingError{}, err)
+				if err != InvalidPaddingError {
+					t.Errorf("expected: %s, got %s", InvalidPaddingError, err)
 				}
 			},
 		}, {
@@ -70,8 +70,8 @@ func TestUnpad(t *testing.T) {
 			input:          []byte("YELLOW SUBMARINE\x01\x02\x03\x04"),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if _, ok := err.(*InvalidPaddingError); !ok {
-					t.Errorf("expected: %s, got: %s", &InvalidPaddingError{}, err)
+				if err != InvalidPaddingError {
+					t.Errorf("expected: %s, got %s", InvalidPaddingError, err)
 				}
 			},
 		},

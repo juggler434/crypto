@@ -1,10 +1,9 @@
 package pkcs7
 
-type InvalidPaddingError struct{}
+import "errors"
 
-func (ipe *InvalidPaddingError) Error() string {
-	return "Padding not in PKCS#7 format"
-}
+var InvalidPaddingError = errors.New("invalid padding")
+
 func Pad(input []byte, blockSize int) []byte {
 	r := len(input) % blockSize
 	var pl int
@@ -35,14 +34,14 @@ func Unpad(input []byte) ([]byte, error) {
 
 func checkPaddingIsValid(input []byte, paddingLength int) error {
 	if len(input) < paddingLength {
-		return &InvalidPaddingError{}
+		return InvalidPaddingError
 	}
 
 	p := input[len(input)-(paddingLength):]
 
 	for _, pc := range p {
 		if uint(pc) != uint(len(p)) {
-			return &InvalidPaddingError{}
+			return InvalidPaddingError
 		}
 	}
 	return nil

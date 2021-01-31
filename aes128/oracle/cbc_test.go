@@ -160,8 +160,8 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDr7kUiKh+eBOC/nkqFuSUOg"),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if _, ok := err.(*pkcs7.InvalidPaddingError); !ok {
-					t.Errorf("expected: %s, got: %s", &pkcs7.InvalidPaddingError{}, err)
+				if err != pkcs7.InvalidPaddingError {
+					t.Errorf("expected: %s, got: %s", pkcs7.InvalidPaddingError, err)
 				}
 			},
 		},
