@@ -1,7 +1,6 @@
 package oracle
 
 import (
-	"errors"
 	"github.com/juggler434/crypto/aes128/cbc"
 	"github.com/juggler434/crypto/encoding/base64"
 	"math/rand"
@@ -48,11 +47,11 @@ func (c *CBCOracle) Decrypt(encryptedText []byte) ([]byte, error) {
 	}
 
 	if len(et) < 17 {
-		return nil, errors.New("input too short")
+		return nil, &ShortInputError{}
 	}
 
 	if et[16] != ':' {
-		return nil, errors.New("malformed initialization vector")
+		return nil, &MalformedInputError{}
 	}
 
 	return cbc.Decrypt(et[17:], c.Key, et[:16])

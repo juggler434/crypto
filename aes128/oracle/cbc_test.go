@@ -41,18 +41,26 @@ func TestNewCBCOracle(t *testing.T) {
 
 func TestCBCOracle_Encrypt(t *testing.T) {
 	tests := []struct {
-		name      string
-		inputFile string
-		shouldErr bool
+		name       string
+		inputFile  string
+		checkError func(t *testing.T, err error)
 	}{
 		{
 			name:      "base case",
 			inputFile: cbcTestFile,
-			shouldErr: false,
+			checkError: func(t *testing.T, err error) {
+				if err != nil {
+					t.Errorf("expected nil error: got: %s", err)
+				}
+			},
 		}, {
 			name:      "malformed base64",
 			inputFile: cbcBadTestFile,
-			shouldErr: true,
+			checkError: func(t *testing.T, err error) {
+				if err == nil {
+					t.Error("expected: error, got: nil")
+				}
+			},
 		},
 	}
 
@@ -74,15 +82,9 @@ func TestCBCOracle_Encrypt(t *testing.T) {
 
 			res, err := r.Encrypt(iv)
 
-			if test.shouldErr {
-				if err == nil {
-					t.Error("expected: err, got: nil")
-				}
+			test.checkError(t, err)
+			if err != nil { //hack to skip the rest of test
 				return
-			} else {
-				if err != nil {
-					t.Errorf("expected: nil error, got: %s", err)
-				}
 			}
 
 			v, err := base64.Decode(res)
@@ -114,33 +116,53 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 		name           string
 		input          []byte
 		expectedOutput []byte
-		shouldErr      bool
+		checkError     func(t *testing.T, err error)
 	}{
 		{
 			name:           "base case",
 			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDol3JBQKbFhLvYynuFYy13Q"),
 			expectedOutput: []byte("This is a test"),
-			shouldErr:      false,
+			checkError: func(t *testing.T, err error) {
+				if err != nil {
+					t.Errorf("expected: nil error, got: %s", err)
+				}
+			},
 		}, {
 			name:           "input too short",
 			input:          []byte("c2hvcnQ="),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if _, ok := err.(*ShortInputError); !ok {
+					t.Errorf("expected: %s, got: %s", &ShortInputError{}, err)
+				}
+			},
 		}, {
 			name:           "invalid base64",
 			input:          []byte("this isn't valid base 64 so should error"),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if err == nil {
+					t.Error("expected: err, got: nil")
+				}
+			},
 		}, {
 			name:           "malformed initialization vector",
-			input:          []byte("JdyQUCmxYS72Mp7hWMtd0A=="),
+			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDBxd2VyamtsO2FzbGRrZmplbGFrc2pka2ZsYTtzbGRrag=="),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if _, ok := err.(*MalformedInputError); !ok {
+					t.Errorf("expected: %s, got: %s", &MalformedInputError{}, err)
+				}
+			},
 		}, {
 			name:           "invalid padding",
 			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDr7kUiKh+eBOC/nkqFuSUOg"),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if err == nil {
+					t.Error("expected: error, got: nil")
+				}
+			},
 		},
 	}
 
@@ -155,15 +177,7 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 			co.Key = []byte("YELLOW SUBMARINE") // set key so that we know what we are encrypting under
 
 			res, err := co.Decrypt(test.input)
-			if test.shouldErr {
-				if err == nil {
-					t.Error("expected: error, got: nil")
-				}
-			} else {
-				if err != nil {
-					t.Errorf("expected: nil error, got: %s", err)
-				}
-			}
+			test.checkError(t, err)
 
 			if !bytes.Equal(res, test.expectedOutput) {
 				t.Errorf("expected: %s, got %s", test.expectedOutput, res)
