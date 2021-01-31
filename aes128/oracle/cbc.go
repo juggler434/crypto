@@ -47,11 +47,11 @@ func (c *CBCOracle) Decrypt(encryptedText []byte) ([]byte, error) {
 	}
 
 	if len(et) < 17 {
-		return nil, &ShortInputError{}
+		return nil, ShortInputError
 	}
 
 	if et[16] != ':' {
-		return nil, &MalformedInputError{}
+		return nil, MalformedInputError
 	}
 
 	return cbc.Decrypt(et[17:], c.Key, et[:16])

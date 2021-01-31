@@ -1,13 +1,6 @@
 package oracle
 
-type ShortInputError struct{}
+import "errors"
 
-func (sie *ShortInputError) Error() string {
-	return "input too short"
-}
-
-type MalformedInputError struct{}
-
-func (mie *MalformedInputError) Error() string {
-	return "Input not in correct format"
-}
+var ShortInputError = errors.New("input too short")
+var MalformedInputError = errors.New("input not in correct format")

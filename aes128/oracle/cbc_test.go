@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"github.com/juggler434/crypto/aes128/cbc"
 	"github.com/juggler434/crypto/encoding/base64"
+	pkcs7 "github.com/juggler434/crypto/padding"
 	"io/ioutil"
 	"testing"
 )
@@ -132,8 +133,8 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 			input:          []byte("c2hvcnQ="),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if _, ok := err.(*ShortInputError); !ok {
-					t.Errorf("expected: %s, got: %s", &ShortInputError{}, err)
+				if err != ShortInputError {
+					t.Errorf("expected: %s, got %s", ShortInputError, err)
 				}
 			},
 		}, {
@@ -150,8 +151,8 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDBxd2VyamtsO2FzbGRrZmplbGFrc2pka2ZsYTtzbGRrag=="),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if _, ok := err.(*MalformedInputError); !ok {
-					t.Errorf("expected: %s, got: %s", &MalformedInputError{}, err)
+				if err != MalformedInputError {
+					t.Errorf("expected: %s, got: %s", MalformedInputError, err)
 				}
 			},
 		}, {
@@ -159,8 +160,8 @@ func TestCBCOracle_Decrypt(t *testing.T) {
 			input:          []byte("MDAwMDAwMDAwMDAwMDAwMDr7kUiKh+eBOC/nkqFuSUOg"),
 			expectedOutput: nil,
 			checkError: func(t *testing.T, err error) {
-				if err == nil {
-					t.Error("expected: error, got: nil")
+				if _, ok := err.(*pkcs7.InvalidPaddingError); !ok {
+					t.Errorf("expected: %s, got: %s", &pkcs7.InvalidPaddingError{}, err)
 				}
 			},
 		},
