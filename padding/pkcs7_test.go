@@ -45,38 +45,42 @@ func TestUnpad(t *testing.T) {
 		name           string
 		input          []byte
 		expectedOutput []byte
-		shouldErr      bool
+		checkError     func(t *testing.T, err error)
 	}{
 		{
 			name:           "base case",
 			input:          []byte("YELLOW SUBMARINE\x04\x04\x04\x04"),
 			expectedOutput: []byte("YELLOW SUBMARINE"),
-			shouldErr:      false,
+			checkError: func(t *testing.T, err error) {
+				if err != nil {
+					t.Errorf("expected, nil error, got: %s", err)
+				}
+			},
 		}, {
 			name:           "too few pad bytes",
 			input:          []byte("YELLOW SUBMARINE\x04\x04\x04"),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if _, ok := err.(*InvalidPaddingError); !ok {
+					t.Errorf("expected: %s, got: %s", &InvalidPaddingError{}, err)
+				}
+			},
 		}, {
 			name:           "unmatching pad bytes",
 			input:          []byte("YELLOW SUBMARINE\x01\x02\x03\x04"),
 			expectedOutput: nil,
-			shouldErr:      true,
+			checkError: func(t *testing.T, err error) {
+				if _, ok := err.(*InvalidPaddingError); !ok {
+					t.Errorf("expected: %s, got: %s", &InvalidPaddingError{}, err)
+				}
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			res, err := Unpad(test.input)
-			if test.shouldErr {
-				if err == nil {
-					t.Error("expected: error, got: nil")
-				}
-			} else {
-				if err != nil {
-					t.Errorf("expected: nil error, got: %s", err)
-				}
-			}
+			test.checkError(t, err)
 
 			if !bytes.Equal(res, test.expectedOutput) {
 				t.Errorf("expected: %s, got %s", test.expectedOutput, res)
