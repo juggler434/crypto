@@ -33,6 +33,10 @@ func Unpad(input []byte) ([]byte, error) {
 }
 
 func checkPaddingIsValid(input []byte, paddingLength int) error {
+	if paddingLength == 0 {
+		return InvalidPaddingError
+	}
+
 	if len(input) < paddingLength {
 		return InvalidPaddingError
 	}
